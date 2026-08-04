@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LinkDeviceResponse(
-    val success: Boolean? = null,
-    val message: String? = null,
-    val deviceId: String? = null
+    val linked: Boolean = false,
+    val serialNumber: String? = null,
+    val patientId: String? = null
 )

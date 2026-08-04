@@ -233,7 +233,7 @@ fun DashboardScreen(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
-            } else if (uiState.patientId != null) {
+            } else if (uiState.pairingCode != null) {
                 Text(
                     text = "Los datos se actualizarán cuando el dispositivo esté sincronizado.",
                     fontSize = 12.sp,

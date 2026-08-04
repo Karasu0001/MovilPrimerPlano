@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BatchHealthDataResponse(
-    val success: Boolean? = null,
-    val recordsProcessed: Int? = null,
-    val message: String? = null
+    val status: String? = null,
+    val alertsTriggered: Int? = null
 )

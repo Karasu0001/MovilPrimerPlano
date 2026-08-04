@@ -31,9 +31,9 @@ class VitalTrackViewModel : ViewModel() {
 
     private fun observePatientSession() {
         viewModelScope.launch {
-            PatientSessionStore.observePatientId().collect { patientId ->
-                if (patientId != null) {
-                    fetchPatientInfo(patientId)
+            PatientSessionStore.observePairingCode().collect { pairingCode ->
+                if (pairingCode != null) {
+                    fetchPatientInfo(pairingCode)
                 } else {
                     _uiState.value = VitalTrackUiState(hasRealData = false)
                 }
@@ -41,15 +41,15 @@ class VitalTrackViewModel : ViewModel() {
         }
     }
 
-    fun fetchPatientInfo(patientId: String) {
+    fun fetchPatientInfo(pairingCode: String) {
         viewModelScope.launch {
             _uiState.value = VitalTrackUiState(isLoading = true, networkError = null)
-            when (val result = healthDataRepository.getPatientInfo(patientId)) {
+            when (val result = healthDataRepository.getPatientInfo(pairingCode)) {
                 is NetworkResult.Success -> {
                     val data = result.data
                     _uiState.value = VitalTrackUiState(
-                        heartRate = data.heartRate?.toString(),
-                        oxygenSaturation = data.oxygenSaturation?.toString(),
+                        heartRate = data.lastHeartRate?.toString(),
+                        oxygenSaturation = data.lastOxygen?.toString(),
                         hasRealData = true,
                         isLoading = false
                     )

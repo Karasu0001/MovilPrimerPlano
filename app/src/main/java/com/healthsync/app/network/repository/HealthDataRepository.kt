@@ -30,11 +30,7 @@ class HealthDataRepository {
                 BatchHealthDataRequest.serializer(),
                 BatchHealthDataResponse.serializer()
             )
-            if (response.success == true) {
-                NetworkResult.Success(response)
-            } else {
-                NetworkResult.Error(response.message ?: "Error al enviar datos", 400)
-            }
+            NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {
                 404 -> NetworkResult.Error("No se encontró un paciente con ese código", 404)

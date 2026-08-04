@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class DashboardUiState(
-    val patientId: String? = null,
+    val pairingCode: String? = null,
     val patientName: String? = null,
     val heartRate: String? = null,
     val oxygenSaturation: String? = null,
     val activityLevel: String? = null,
-    val lastSync: String? = null,
+    val lastReadingAt: String? = null,
     val isLoading: Boolean = false,
     val networkError: String? = null
 )
@@ -34,27 +34,27 @@ class DashboardViewModel : ViewModel() {
 
     private fun observePatientSession() {
         viewModelScope.launch {
-            PatientSessionStore.observePatientId().collect { patientId ->
-                _uiState.value = _uiState.value.copy(patientId = patientId)
-                if (patientId != null) {
-                    fetchPatientInfo(patientId)
+            PatientSessionStore.observePairingCode().collect { pairingCode ->
+                _uiState.value = _uiState.value.copy(pairingCode = pairingCode)
+                if (pairingCode != null) {
+                    fetchPatientInfo(pairingCode)
                 }
             }
         }
     }
 
-    fun fetchPatientInfo(patientId: String) {
+    fun fetchPatientInfo(pairingCode: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, networkError = null)
-            when (val result = healthDataRepository.getPatientInfo(patientId)) {
+            when (val result = healthDataRepository.getPatientInfo(pairingCode)) {
                 is NetworkResult.Success -> {
                     val data = result.data
                     _uiState.value = _uiState.value.copy(
-                        patientName = data.patientName,
-                        heartRate = data.heartRate?.toString(),
-                        oxygenSaturation = data.oxygenSaturation?.toString(),
-                        activityLevel = data.activityLevel?.toString(),
-                        lastSync = data.lastSync,
+                        patientName = data.name,
+                        heartRate = data.lastHeartRate?.toString(),
+                        oxygenSaturation = data.lastOxygen?.toString(),
+                        activityLevel = data.lastActivity?.toString(),
+                        lastReadingAt = data.lastReadingAt,
                         isLoading = false
                     )
                 }

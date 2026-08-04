@@ -48,8 +48,18 @@ object PatientSessionStore {
         }
     }
 
+    fun observePairingCode(): Flow<String?> {
+        return getContext().dataStore.data.map { preferences ->
+            preferences[KEY_PAIRING_CODE]
+        }
+    }
+
     suspend fun getPatientId(): String? {
         return getContext().dataStore.data.first()[KEY_PATIENT_ID]
+    }
+
+    suspend fun getPairingCode(): String? {
+        return getContext().dataStore.data.first()[KEY_PAIRING_CODE]
     }
 
     suspend fun clearPatientSession() {

@@ -4,6 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.healthsync.app.data.AuthSessionStore
+import com.healthsync.app.network.NetworkResult
+import com.healthsync.app.network.repository.AuthRepository
+import kotlinx.coroutines.launch
 
 data class LoginUiState(
     val email: String = "",
@@ -12,20 +17,23 @@ data class LoginUiState(
     val showPassword: Boolean = false,
     val isSubmitting: Boolean = false,
     val emailError: String? = null,
-    val passwordError: String? = null
+    val passwordError: String? = null,
+    val networkError: String? = null
 )
 
 class LoginViewModel : ViewModel() {
+
+    private val authRepository = AuthRepository()
 
     var uiState by mutableStateOf(LoginUiState())
         private set
 
     fun onEmailChanged(value: String) {
-        uiState = uiState.copy(email = value, emailError = null)
+        uiState = uiState.copy(email = value, emailError = null, networkError = null)
     }
 
     fun onPasswordChanged(value: String) {
-        uiState = uiState.copy(password = value, passwordError = null)
+        uiState = uiState.copy(password = value, passwordError = null, networkError = null)
     }
 
     fun onRememberMeChanged(value: Boolean) {
@@ -58,9 +66,28 @@ class LoginViewModel : ViewModel() {
 
         if (hasError) return
 
-        uiState = uiState.copy(isSubmitting = true)
-        // TODO: integrar con servicio de autenticación
-        onSuccess()
-        uiState = uiState.copy(isSubmitting = false)
+        uiState = uiState.copy(isSubmitting = true, networkError = null)
+        viewModelScope.launch {
+            when (val result = authRepository.login(uiState.email, uiState.password)) {
+                is NetworkResult.Success -> {
+                    val data = result.data
+                    AuthSessionStore.saveSession(
+                        token = data.token ?: "",
+                        caregiverId = data.caregiver?.id,
+                        caregiverName = data.caregiver?.name,
+                        caregiverEmail = data.caregiver?.email
+                    )
+                    uiState = uiState.copy(isSubmitting = false)
+                    onSuccess()
+                }
+                is NetworkResult.Error -> {
+                    uiState = uiState.copy(
+                        isSubmitting = false,
+                        networkError = result.message
+                    )
+                }
+                is NetworkResult.Loading -> Unit
+            }
+        }
     }
 }

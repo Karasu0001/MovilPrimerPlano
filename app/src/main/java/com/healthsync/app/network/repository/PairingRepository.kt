@@ -51,10 +51,10 @@ class PairingRepository {
                 LinkDeviceRequest.serializer(),
                 LinkDeviceResponse.serializer()
             )
-            if (response.success == true) {
+            if (response.linked) {
                 NetworkResult.Success(response)
             } else {
-                NetworkResult.Error(response.message ?: "Error al vincular dispositivo", 400)
+                NetworkResult.Error("No se pudo vincular el dispositivo", 400)
             }
         } catch (e: ApiException) {
             when (e.httpCode) {

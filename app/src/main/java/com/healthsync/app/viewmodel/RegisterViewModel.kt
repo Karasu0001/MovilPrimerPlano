@@ -4,6 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.healthsync.app.data.AuthSessionStore
+import com.healthsync.app.network.NetworkResult
+import com.healthsync.app.network.repository.AuthRepository
+import kotlinx.coroutines.launch
 
 data class RegisterUiState(
     val fullName: String = "",
@@ -15,28 +20,31 @@ data class RegisterUiState(
     val fullNameError: String? = null,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val confirmPasswordError: String? = null
+    val confirmPasswordError: String? = null,
+    val networkError: String? = null
 )
 
 class RegisterViewModel : ViewModel() {
+
+    private val authRepository = AuthRepository()
 
     var uiState by mutableStateOf(RegisterUiState())
         private set
 
     fun onFullNameChanged(value: String) {
-        uiState = uiState.copy(fullName = value, fullNameError = null)
+        uiState = uiState.copy(fullName = value, fullNameError = null, networkError = null)
     }
 
     fun onEmailChanged(value: String) {
-        uiState = uiState.copy(email = value, emailError = null)
+        uiState = uiState.copy(email = value, emailError = null, networkError = null)
     }
 
     fun onPasswordChanged(value: String) {
-        uiState = uiState.copy(password = value, passwordError = null)
+        uiState = uiState.copy(password = value, passwordError = null, networkError = null)
     }
 
     fun onConfirmPasswordChanged(value: String) {
-        uiState = uiState.copy(confirmPassword = value, confirmPasswordError = null)
+        uiState = uiState.copy(confirmPassword = value, confirmPasswordError = null, networkError = null)
     }
 
     fun onTogglePasswordVisibility() {
@@ -81,9 +89,38 @@ class RegisterViewModel : ViewModel() {
 
         if (hasError) return
 
-        uiState = uiState.copy(isSubmitting = true)
-        // TODO: integrar con servicio de registro
-        onSuccess()
-        uiState = uiState.copy(isSubmitting = false)
+        uiState = uiState.copy(isSubmitting = true, networkError = null)
+        viewModelScope.launch {
+            val nameParts = uiState.fullName.split(" ", limit = 2)
+            val name = nameParts.getOrElse(0) { "" }
+            val lastname = nameParts.getOrElse(1) { "" }
+
+            when (val result = authRepository.register(
+                name = name,
+                lastname = lastname,
+                phone = "",
+                email = uiState.email,
+                password = uiState.password
+            )) {
+                is NetworkResult.Success -> {
+                    val data = result.data
+                    AuthSessionStore.saveSession(
+                        token = data.token ?: "",
+                        caregiverId = data.caregiver?.id,
+                        caregiverName = data.caregiver?.name,
+                        caregiverEmail = data.caregiver?.email
+                    )
+                    uiState = uiState.copy(isSubmitting = false)
+                    onSuccess()
+                }
+                is NetworkResult.Error -> {
+                    uiState = uiState.copy(
+                        isSubmitting = false,
+                        networkError = result.message
+                    )
+                }
+                is NetworkResult.Loading -> Unit
+            }
+        }
     }
 }

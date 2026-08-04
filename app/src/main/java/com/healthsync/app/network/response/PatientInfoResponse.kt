@@ -4,12 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PatientInfoResponse(
-    val patientCode: String,
-    val fullName: String,
-    val patientName: String? = null,
-    val deviceConnected: Boolean,
-    val lastSync: String? = null,
-    val heartRate: Int? = null,
-    val oxygenSaturation: Int? = null,
-    val activityLevel: Int? = null
+    val patientCode: String? = null,
+    val name: String? = null,
+    val deviceSerialNumber: String? = null,
+    val lastHeartRate: Int? = null,
+    val lastOxygen: Int? = null,
+    val lastActivity: Int? = null,
+    val lastReadingAt: String? = null
 )
