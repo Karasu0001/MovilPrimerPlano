@@ -51,6 +51,8 @@ import com.healthsync.app.ui.components.BrandLogo
 import com.healthsync.app.ui.components.PrimaryButton
 import com.healthsync.app.ui.theme.ColorBgPage
 import com.healthsync.app.ui.theme.ColorBorder
+import com.healthsync.app.ui.theme.ColorErrorBg
+import com.healthsync.app.ui.theme.ColorErrorRed
 import com.healthsync.app.ui.theme.ColorInputBg
 import com.healthsync.app.ui.theme.ColorPrimary
 import com.healthsync.app.ui.theme.ColorTextMuted
@@ -227,6 +229,23 @@ fun LoginScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if (state.networkError != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(ColorErrorBg, RoundedCornerShape(12.dp))
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = state.networkError,
+                            fontSize = 13.sp,
+                            color = ColorErrorRed
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Botón Primario
                 PrimaryButton(

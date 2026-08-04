@@ -1,5 +1,6 @@
 package com.healthsync.app.network
 
+import com.healthsync.app.BuildConfig
 import com.healthsync.app.network.request.BatchHealthDataRequest
 import com.healthsync.app.network.request.LinkDeviceRequest
 import com.healthsync.app.network.request.ValidateCodeRequest
@@ -7,6 +8,8 @@ import com.healthsync.app.network.response.BatchHealthDataResponse
 import com.healthsync.app.network.response.LinkDeviceResponse
 import com.healthsync.app.network.response.PatientInfoResponse
 import com.healthsync.app.network.response.ValidateCodeResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -30,7 +33,11 @@ object ApiClient {
 
     private val client: OkHttpClient by lazy {
         val logging = HttpLoggingInterceptor()
-        logging.level = HttpLoggingInterceptor.Level.NONE
+        logging.level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
 
         OkHttpClient.Builder()
             .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -42,7 +49,7 @@ object ApiClient {
             .build()
     }
 
-    suspend fun <T> get(path: String, serializer: KSerializer<T>): T {
+    suspend fun <T> get(path: String, serializer: KSerializer<T>): T = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url(BASE_URL + path)
             .build()
@@ -52,10 +59,10 @@ object ApiClient {
             throw ApiException(response.code, body)
         }
         val body = response.body?.string() ?: throw java.io.IOException("Empty body")
-        return json.decodeFromString(serializer, body)
+        json.decodeFromString(serializer, body)
     }
 
-    suspend fun <T, R> post(path: String, body: T, bodySerializer: KSerializer<T>, responseSerializer: KSerializer<R>): R {
+    suspend fun <T, R> post(path: String, body: T, bodySerializer: KSerializer<T>, responseSerializer: KSerializer<R>): R = withContext(Dispatchers.IO) {
         val jsonString = json.encodeToString(bodySerializer, body)
         val requestBody = jsonString.toRequestBody(mediaType)
         val request = Request.Builder()
@@ -64,10 +71,10 @@ object ApiClient {
             .build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
-            val body = response.body?.string().orEmpty()
-            throw ApiException(response.code, body)
+            val respBody = response.body?.string().orEmpty()
+            throw ApiException(response.code, respBody)
         }
         val responseBody = response.body?.string() ?: throw java.io.IOException("Empty body")
-        return json.decodeFromString(responseSerializer, responseBody)
+        json.decodeFromString(responseSerializer, responseBody)
     }
 }
