@@ -49,10 +49,13 @@ object ApiClient {
             .build()
     }
 
-    suspend fun <T> get(path: String, serializer: KSerializer<T>): T = withContext(Dispatchers.IO) {
-        val request = Request.Builder()
+    suspend fun <T> get(path: String, serializer: KSerializer<T>, token: String? = null): T = withContext(Dispatchers.IO) {
+        val requestBuilder = Request.Builder()
             .url(BASE_URL + path)
-            .build()
+        if (token != null) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+        val request = requestBuilder.build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
             val body = response.body?.string().orEmpty()

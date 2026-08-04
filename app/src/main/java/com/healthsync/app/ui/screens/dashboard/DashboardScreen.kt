@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.healthsync.app.navigation.Routes
 import com.healthsync.app.ui.components.AppCard
 import com.healthsync.app.ui.components.BottomNavBar
 import com.healthsync.app.ui.components.BrandLogo
@@ -244,7 +245,17 @@ fun DashboardScreen(
             }
         }
 
-        BottomNavBar(activeRoute = "welcome")
+        BottomNavBar(
+        activeRoute = Routes.Dashboard.route,
+        onItemClick = { route ->
+            when (route) {
+                Routes.QrPairingFlow.route -> onNavigateToPairing()
+                Routes.Activity.route -> onNavigateToActivity()
+                Routes.Profile.route -> onNavigateToProfile()
+                else -> Unit
+            }
+        }
+    )
     }
 }
 

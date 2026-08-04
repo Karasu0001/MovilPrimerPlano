@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.healthsync.app.navigation.Routes
 import com.healthsync.app.ui.theme.ColorPrimary
 import com.healthsync.app.ui.theme.ColorTextMuted
 
@@ -33,10 +34,10 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem("Home", Icons.Default.Home, "welcome"),
-    BottomNavItem("Dispositivos", Icons.Default.Watch, "pairing/code/search"),
-    BottomNavItem("Actividad", Icons.Default.MonitorHeart, "activity"),
-    BottomNavItem("Perfil", Icons.Default.Person, "profile")
+    BottomNavItem("Home", Icons.Default.Home, Routes.Dashboard.route),
+    BottomNavItem("Dispositivos", Icons.Default.Watch, Routes.QrPairingFlow.route),
+    BottomNavItem("Actividad", Icons.Default.MonitorHeart, Routes.Activity.route),
+    BottomNavItem("Perfil", Icons.Default.Person, Routes.Profile.route)
 )
 
 @Composable

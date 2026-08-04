@@ -66,4 +66,16 @@ object AuthSessionStore {
             preferences.remove(KEY_CAREGIVER_EMAIL)
         }
     }
+
+    suspend fun getCaregiverName(): String? {
+        return getContext().dataStore.data.first()[KEY_CAREGIVER_NAME]
+    }
+
+    suspend fun getCaregiverEmail(): String? {
+        return getContext().dataStore.data.first()[KEY_CAREGIVER_EMAIL]
+    }
+
+    suspend fun getCaregiverId(): String? {
+        return getContext().dataStore.data.first()[KEY_CAREGIVER_ID]
+    }
 }

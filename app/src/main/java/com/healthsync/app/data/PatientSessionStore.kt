@@ -62,6 +62,10 @@ object PatientSessionStore {
         return getContext().dataStore.data.first()[KEY_PAIRING_CODE]
     }
 
+    suspend fun getPatientName(): String? {
+        return getContext().dataStore.data.first()[KEY_PATIENT_NAME]
+    }
+
     suspend fun clearPatientSession() {
         getContext().dataStore.edit { preferences ->
             preferences.remove(KEY_PATIENT_ID)

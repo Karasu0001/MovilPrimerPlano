@@ -1,9 +1,16 @@
 package com.healthsync.app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.healthsync.app.data.AuthSessionStore
+import com.healthsync.app.ui.screens.activity.ActivityScreen
 import com.healthsync.app.ui.screens.auth.ForgotPasswordScreen
 import com.healthsync.app.ui.screens.auth.LoginScreen
 import com.healthsync.app.ui.screens.auth.RegisterScreen
@@ -11,6 +18,7 @@ import com.healthsync.app.ui.screens.dashboard.DashboardScreen
 import com.healthsync.app.ui.screens.onboarding.WelcomeScreen
 import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
 import com.healthsync.app.ui.screens.pairing.qr.QrPairingFlowScreen
+import com.healthsync.app.ui.screens.profile.ProfileScreen
 import com.healthsync.app.ui.screens.wearable.vitaltrack.VitalTrackScreen
 
 @Composable
@@ -20,10 +28,23 @@ fun NavGraph(navController: NavHostController) {
         startDestination = Routes.Welcome.route
     ) {
         composable(Routes.Welcome.route) {
-            WelcomeScreen(
-                onStart = { navController.navigate(Routes.Register.route) },
-                onLoginClick = { navController.navigate(Routes.Login.route) }
-            )
+            var sessionChecked by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                val token = AuthSessionStore.getToken()
+                if (!token.isNullOrEmpty()) {
+                    navController.navigate(Routes.Dashboard.route) {
+                        popUpTo(Routes.Welcome.route) { inclusive = true }
+                    }
+                } else {
+                    sessionChecked = true
+                }
+            }
+            if (sessionChecked) {
+                WelcomeScreen(
+                    onStart = { navController.navigate(Routes.Register.route) },
+                    onLoginClick = { navController.navigate(Routes.Login.route) }
+                )
+            }
         }
 
         composable(Routes.Login.route) {
@@ -51,8 +72,8 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.Dashboard.route) {
             DashboardScreen(
                 onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
-                onNavigateToActivity = { },
-                onNavigateToProfile = { },
+                onNavigateToActivity = { navController.navigate(Routes.Activity.route) },
+                onNavigateToProfile = { navController.navigate(Routes.Profile.route) },
                 onNavigateToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) }
             )
         }
@@ -74,6 +95,29 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.VitalTrackFlow.route) {
             VitalTrackScreen(
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.Activity.route) {
+            ActivityScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
+                onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
+                onNavigateToProfile = { navController.navigate(Routes.Profile.route) }
+            )
+        }
+
+        composable(Routes.Profile.route) {
+            ProfileScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(Routes.Welcome.route) {
+                        popUpTo(0)
+                    }
+                },
+                onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
+                onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
+                onNavigateToActivity = { navController.navigate(Routes.Activity.route) }
             )
         }
     }

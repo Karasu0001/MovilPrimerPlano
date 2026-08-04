@@ -14,4 +14,6 @@ sealed class Routes(val route: String) {
     object CodePairingCancelled : Routes("pairing/code/cancelled")
     object QrPairingFlow : Routes("pairing/qr/flow")
     object VitalTrackFlow : Routes("vitaltrack/flow")
+    object Activity : Routes("activity")
+    object Profile : Routes("profile")
 }
