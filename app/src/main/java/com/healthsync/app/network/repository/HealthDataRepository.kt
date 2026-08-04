@@ -1,10 +1,17 @@
 package com.healthsync.app.network.repository
 
+import com.healthsync.app.network.ApiException
 import com.healthsync.app.network.ApiClient
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.RateLimiter
+import com.healthsync.app.network.request.BatchHealthDataRequest
+import com.healthsync.app.network.request.BatchDataPoint
+import com.healthsync.app.network.response.BatchHealthDataResponse
+import com.healthsync.app.network.response.PatientInfoResponse
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.serializer
+import kotlinx.coroutines.delay
 
 class HealthDataRepository {
 
@@ -12,22 +19,26 @@ class HealthDataRepository {
 
     suspend fun batchHealthData(
         patientCode: String,
-        data: List<Map<String, Any>>
-    ): NetworkResult<BatchHealthDataResult> {
+        data: List<BatchDataPoint>
+    ): NetworkResult<BatchHealthDataResponse> {
         return try {
             rateLimiter.acquire()
-            val body = mapOf(
-                "patientCode" to patientCode,
-                "data" to data
+            val request = BatchHealthDataRequest(patientCode, data)
+            val response = ApiClient.post(
+                "api/v1/health-data/batch",
+                request,
+                BatchHealthDataRequest.serializer(),
+                BatchHealthDataResponse.serializer()
             )
-            val response = ApiClient.post("api/v1/health-data/batch", body)
-            val success = getBoolean(response, "success")
-            val recordsProcessed = getInt(response, "recordsProcessed")
-            val message = getString(response, "message")
-            if (success) {
-                NetworkResult.Success(BatchHealthDataResult(success, recordsProcessed, message))
+            if (response.success == true) {
+                NetworkResult.Success(response)
             } else {
-                NetworkResult.Error(message.ifEmpty { "Error al enviar datos" }, 400)
+                NetworkResult.Error(response.message ?: "Error al enviar datos", 400)
+            }
+        } catch (e: ApiException) {
+            when (e.httpCode) {
+                404 -> NetworkResult.Error("No se encontró un paciente con ese código", 404)
+                else -> NetworkResult.Error(extractErrorMessage(e.rawBody) ?: "Error del servidor")
             }
         } catch (e: java.net.UnknownHostException) {
             NetworkResult.Error("Sin conexión a internet. Verificá tu red Wi-Fi o datos móviles.")
@@ -40,20 +51,18 @@ class HealthDataRepository {
         }
     }
 
-    suspend fun getPatientInfo(patientCode: String): NetworkResult<PatientInfoResult> {
+    suspend fun getPatientInfo(patientCode: String): NetworkResult<PatientInfoResponse> {
         return try {
-            val response = ApiClient.get("api/v1/health-data/patient-info/$patientCode")
-            NetworkResult.Success(
-                PatientInfoResult(
-                    patientCode = getString(response, "patientCode"),
-                    fullName = getString(response, "fullName"),
-                    deviceConnected = getBoolean(response, "deviceConnected"),
-                    lastSync = getString(response, "lastSync").takeIf { it.isNotEmpty() },
-                    heartRate = getIntOrNull(response, "heartRate"),
-                    oxygenSaturation = getIntOrNull(response, "oxygenSaturation"),
-                    activityLevel = getIntOrNull(response, "activityLevel")
-                )
+            val response = ApiClient.get(
+                "api/v1/health-data/patient-info/$patientCode",
+                PatientInfoResponse.serializer()
             )
+            NetworkResult.Success(response)
+        } catch (e: ApiException) {
+            when (e.httpCode) {
+                404 -> NetworkResult.Error("No se encontró un paciente con ese código", 404)
+                else -> NetworkResult.Error(extractErrorMessage(e.rawBody) ?: "Error del servidor")
+            }
         } catch (e: java.net.UnknownHostException) {
             NetworkResult.Error("Sin conexión a internet. Verificá tu red Wi-Fi o datos móviles.")
         } catch (e: java.net.SocketTimeoutException) {
@@ -65,35 +74,22 @@ class HealthDataRepository {
         }
     }
 
-    private fun getBoolean(json: JsonObject, key: String): Boolean {
-        return (json[key] as? JsonPrimitive)?.content?.toBoolean() ?: false
-    }
-
-    private fun getString(json: JsonObject, key: String): String {
-        return (json[key] as? JsonPrimitive)?.content ?: ""
-    }
-
-    private fun getInt(json: JsonObject, key: String): Int {
-        return (json[key] as? JsonPrimitive)?.content?.toIntOrNull() ?: 0
-    }
-
-    private fun getIntOrNull(json: JsonObject, key: String): Int? {
-        return (json[key] as? JsonPrimitive)?.content?.toIntOrNull()
+    private fun extractErrorMessage(rawBody: String): String? {
+        return try {
+            val jsonElement = ApiClient.json.parseToJsonElement(rawBody)
+            when (jsonElement) {
+                is JsonObject -> {
+                    val error = jsonElement["error"] ?: return null
+                    when (error) {
+                        is JsonObject -> error["message"]?.jsonPrimitive?.content
+                        is kotlinx.serialization.json.JsonPrimitive -> error.content
+                        else -> null
+                    }
+                }
+                else -> null
+            }
+        } catch (_: Exception) {
+            null
+        }
     }
 }
-
-data class BatchHealthDataResult(
-    val success: Boolean,
-    val recordsProcessed: Int,
-    val message: String?
-)
-
-data class PatientInfoResult(
-    val patientCode: String,
-    val fullName: String,
-    val deviceConnected: Boolean,
-    val lastSync: String?,
-    val heartRate: Int?,
-    val oxygenSaturation: Int?,
-    val activityLevel: Int?
-)

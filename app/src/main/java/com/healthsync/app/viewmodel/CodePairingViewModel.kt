@@ -5,9 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.healthsync.app.data.PatientSessionStore
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.repository.PairingRepository
-import com.healthsync.app.network.repository.ValidateCodeResult
+import com.healthsync.app.network.response.LinkDeviceResponse
+import com.healthsync.app.network.response.ValidateCodeResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -22,9 +24,10 @@ sealed class PairingStep {
 
 data class CodePairingUiState(
     val step: PairingStep = PairingStep.Searching,
-    val pairingCode: String = "458 921",
+    val pairingCode: String = "458921",
     val deviceName: String = "Dialitech Watch Pro",
     val deviceModel: String = "DL-W3",
+    val deviceSerialNumber: String = "",
     val signalStrength: String = "Señal Excelente",
     val batteryLevel: String = "85%",
     val isLoading: Boolean = false,
@@ -46,7 +49,8 @@ class CodePairingViewModel : ViewModel() {
     fun onConfirmFromPhone() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, networkError = null)
-            val validateResult = pairingRepository.validateCode(uiState.pairingCode)
+            val code = uiState.pairingCode.replace(" ", "")
+            val validateResult = pairingRepository.validateCode(code)
             handleValidateResult(validateResult)
         }
     }
@@ -54,25 +58,35 @@ class CodePairingViewModel : ViewModel() {
     fun onAcceptFromWatch() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, networkError = null)
-            val validateResult = pairingRepository.validateCode(uiState.pairingCode)
+            val code = uiState.pairingCode.replace(" ", "")
+            val validateResult = pairingRepository.validateCode(code)
             handleValidateResult(validateResult)
         }
     }
 
-    private suspend fun handleValidateResult(validateResult: NetworkResult<ValidateCodeResult>) {
+    private suspend fun handleValidateResult(validateResult: NetworkResult<ValidateCodeResponse>) {
         when (validateResult) {
             is NetworkResult.Success -> {
-                val patientCode = validateResult.data.patientCode ?: ""
+                val patientId = validateResult.data.patientId ?: ""
+                val serialNumber = uiState.deviceSerialNumber.takeIf { it.isNotEmpty() }
+                    ?: uiState.deviceModel
                 val linkResult = pairingRepository.linkDevice(
-                    uiState.pairingCode,
-                    uiState.deviceModel
+                    uiState.pairingCode.replace(" ", ""),
+                    serialNumber
                 )
                 when (linkResult) {
                     is NetworkResult.Success -> {
+                        viewModelScope.launch {
+                            PatientSessionStore.savePatientSession(
+                                patientId = patientId,
+                                pairingCode = uiState.pairingCode.replace(" ", ""),
+                                patientName = validateResult.data.patientName
+                            )
+                        }
                         uiState = uiState.copy(
                             step = PairingStep.Syncing,
                             isLoading = false,
-                            patientCode = patientCode
+                            patientCode = patientId
                         )
                         startSyncProgress()
                     }

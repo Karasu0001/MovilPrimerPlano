@@ -24,9 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.healthsync.app.network.repository.HealthDataRepository
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthsync.app.ui.components.AppCard
 import com.healthsync.app.ui.components.BottomNavBar
 import com.healthsync.app.ui.components.BrandLogo
@@ -49,6 +48,7 @@ import com.healthsync.app.ui.theme.ColorSuccessGreen
 import com.healthsync.app.ui.theme.ColorTextMuted
 import com.healthsync.app.ui.theme.ColorTextPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
+import com.healthsync.app.viewmodel.DashboardViewModel
 
 @Composable
 fun DashboardScreen(
@@ -57,13 +57,11 @@ fun DashboardScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateToVitalTrack: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val healthDataRepository = remember { HealthDataRepository() }
+    val dashboardViewModel: DashboardViewModel = viewModel()
+    val uiState by dashboardViewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            healthDataRepository.getPatientInfo("PATIENT_DEFAULT")
-        }
+        dashboardViewModel.clearNetworkError()
     }
 
     Column(
@@ -201,22 +199,49 @@ fun DashboardScreen(
                         color = ColorTextPrimary
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    ResumenRow("Frecuencia cardíaca", "-- lpm", "Sin datos")
-                    ResumenRow("Presión arterial", "--/-- mmHg", "Sin datos")
-                    ResumenRow("Saturación O2", "--%", "Sin datos")
-                    ResumenRow("Peso", "-- kg", "Sin datos")
+                    ResumenRow(
+                        "Frecuencia cardíaca",
+                        uiState.heartRate ?: "-- lpm",
+                        if (uiState.heartRate != null) "Normal" else "Sin datos"
+                    )
+                    ResumenRow(
+                        "Presión arterial",
+                        "--/-- mmHg",
+                        "Sin datos"
+                    )
+                    ResumenRow(
+                        "Saturación O2",
+                        uiState.oxygenSaturation?.let { "$it%" } ?: "--%",
+                        if (uiState.oxygenSaturation != null) "Normal" else "Sin datos"
+                    )
+                    ResumenRow(
+                        "Peso",
+                        "-- kg",
+                        "Sin datos"
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Los datos se actualizarán cuando el dispositivo esté sincronizado.",
-                fontSize = 12.sp,
-                color = ColorTextMuted,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
+            val networkError = uiState.networkError
+            if (networkError != null) {
+                Text(
+                    text = networkError,
+                    fontSize = 12.sp,
+                    color = ColorTextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            } else if (uiState.patientId != null) {
+                Text(
+                    text = "Los datos se actualizarán cuando el dispositivo esté sincronizado.",
+                    fontSize = 12.sp,
+                    color = ColorTextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
         }
 
         BottomNavBar(activeRoute = "welcome")

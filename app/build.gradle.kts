@@ -87,10 +87,12 @@ dependencies {
     // ZXing QR generation
     implementation("com.google.zxing:core:3.5.3")
 
-    // Retrofit + OkHttp
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // OkHttp + kotlinx-serialization-json
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

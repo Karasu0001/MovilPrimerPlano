@@ -1,9 +1,15 @@
 package com.healthsync.app.network
 
+import com.healthsync.app.network.request.BatchHealthDataRequest
+import com.healthsync.app.network.request.LinkDeviceRequest
+import com.healthsync.app.network.request.ValidateCodeRequest
+import com.healthsync.app.network.response.BatchHealthDataResponse
+import com.healthsync.app.network.response.LinkDeviceResponse
+import com.healthsync.app.network.response.PatientInfoResponse
+import com.healthsync.app.network.response.ValidateCodeResponse
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.serializer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -36,37 +42,32 @@ object ApiClient {
             .build()
     }
 
-    suspend fun get(path: String): JsonObject {
+    suspend fun <T> get(path: String, serializer: KSerializer<T>): T {
         val request = Request.Builder()
             .url(BASE_URL + path)
             .build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
-            throw java.io.IOException("HTTP ${response.code}")
+            val body = response.body?.string().orEmpty()
+            throw ApiException(response.code, body)
         }
         val body = response.body?.string() ?: throw java.io.IOException("Empty body")
-        return json.parseToJsonElement(body).jsonObject
+        return json.decodeFromString(serializer, body)
     }
 
-    suspend fun post(path: String, body: Map<String, Any>): JsonObject {
-        val jsonObject = body.mapValues { (_, value) ->
-            when (value) {
-                is Boolean -> JsonPrimitive(value)
-                is Number -> JsonPrimitive(value)
-                is String -> JsonPrimitive(value)
-                else -> JsonPrimitive(value.toString())
-            }
-        }
-        val requestBody = JsonObject(jsonObject).toString().toRequestBody(mediaType)
+    suspend fun <T, R> post(path: String, body: T, bodySerializer: KSerializer<T>, responseSerializer: KSerializer<R>): R {
+        val jsonString = json.encodeToString(bodySerializer, body)
+        val requestBody = jsonString.toRequestBody(mediaType)
         val request = Request.Builder()
             .url(BASE_URL + path)
             .post(requestBody)
             .build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
-            throw java.io.IOException("HTTP ${response.code}")
+            val body = response.body?.string().orEmpty()
+            throw ApiException(response.code, body)
         }
         val responseBody = response.body?.string() ?: throw java.io.IOException("Empty body")
-        return json.parseToJsonElement(responseBody).jsonObject
+        return json.decodeFromString(responseSerializer, responseBody)
     }
 }

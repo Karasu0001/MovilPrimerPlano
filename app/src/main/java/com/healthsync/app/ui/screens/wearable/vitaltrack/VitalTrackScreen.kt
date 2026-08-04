@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthsync.app.ui.components.AppCard
 import com.healthsync.app.ui.components.WearableFrame
 import com.healthsync.app.ui.components.WearableTheme
@@ -43,11 +46,19 @@ import com.healthsync.app.ui.theme.ColorWearableRingAccentBlue
 import com.healthsync.app.ui.theme.ColorWearableRingAccentTeal
 import com.healthsync.app.ui.theme.ColorWearableText
 import com.healthsync.app.ui.theme.ColorWearableTextMuted
+import com.healthsync.app.viewmodel.VitalTrackViewModel
 
 @Composable
 fun VitalTrackScreen(
     onBack: () -> Unit = {}
 ) {
+    val vitalTrackViewModel: VitalTrackViewModel = viewModel()
+    val uiState by vitalTrackViewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        vitalTrackViewModel.clearNetworkError()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +109,7 @@ fun VitalTrackScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "72",
+                        text = uiState.heartRate ?: "72",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorWearableText
@@ -114,7 +125,12 @@ fun VitalTrackScreen(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("O2", fontSize = 10.sp, color = ColorWearableTextMuted)
-                            Text("98%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorWearableText)
+                            Text(
+                                text = uiState.oxygenSaturation ?: "98%",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ColorWearableText
+                            )
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("PAS", fontSize = 10.sp, color = ColorWearableTextMuted)
@@ -135,8 +151,18 @@ fun VitalTrackScreen(
                         color = ColorTextPrimary
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    VitalSignRow("Frecuencia cardíaca", "72 lpm", "Normal", ColorSuccessGreen)
-                    VitalSignRow("Saturación O2", "98%", "Normal", ColorSuccessGreen)
+                    VitalSignRow(
+                        "Frecuencia cardíaca",
+                        uiState.heartRate ?: "72 lpm",
+                        if (uiState.heartRate != null) "Normal" else "Sin datos",
+                        if (uiState.heartRate != null) ColorSuccessGreen else ColorVtRingWarning
+                    )
+                    VitalSignRow(
+                        "Saturación O2",
+                        uiState.oxygenSaturation?.let { "$it%" } ?: "98%",
+                        if (uiState.oxygenSaturation != null) "Normal" else "Sin datos",
+                        if (uiState.oxygenSaturation != null) ColorSuccessGreen else ColorVtRingWarning
+                    )
                     VitalSignRow("Presión arterial", "120/80", "Normal", ColorSuccessGreen)
                     VitalSignRow("Temperatura", "36.5°C", "Normal", ColorSuccessGreen)
                 }
@@ -144,13 +170,32 @@ fun VitalTrackScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                text = "Los datos mostrados son simulados. Conecta tu Dialitech Watch Pro para obtener lecturas reales.",
-                fontSize = 12.sp,
-                color = ColorTextMuted,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            val networkError = uiState.networkError
+            if (networkError != null) {
+                Text(
+                    text = networkError,
+                    fontSize = 12.sp,
+                    color = ColorTextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            } else if (uiState.hasRealData) {
+                Text(
+                    text = "Datos obtenidos del dispositivo vinculado.",
+                    fontSize = 12.sp,
+                    color = ColorTextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            } else {
+                Text(
+                    text = "Los datos mostrados son simulados. Conecta tu Dialitech Watch Pro para obtener lecturas reales.",
+                    fontSize = 12.sp,
+                    color = ColorTextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
         }
     }
 }
