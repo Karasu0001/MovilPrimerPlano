@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,9 +31,10 @@ import androidx.compose.ui.unit.sp
 import com.healthsync.app.ui.theme.ColorBgPage
 import com.healthsync.app.ui.theme.ColorCodeBoxBg
 import com.healthsync.app.ui.theme.ColorCodeText
+import com.healthsync.app.ui.theme.ColorErrorBg
+import com.healthsync.app.ui.theme.ColorErrorRed
 import com.healthsync.app.ui.theme.ColorPhoneHeaderBg
 import com.healthsync.app.ui.theme.ColorPrimary
-import com.healthsync.app.ui.theme.ColorSuccessGreen
 import com.healthsync.app.ui.theme.ColorTextPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
 
@@ -41,7 +44,9 @@ fun QrConfirmScreen(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     deviceName: String = "Dialitech Watch Pro",
-    scannedCode: String = ""
+    scannedCode: String = "",
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
     Column(
         modifier = modifier
@@ -72,12 +77,18 @@ fun QrConfirmScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(40.dp))
-                    .background(ColorSuccessGreen.copy(alpha = 0.1f)),
+                    .size(80.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "\u2713", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = ColorSuccessGreen)
+                Box(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(48.dp))
+                        .background(ColorPrimary.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("\u2713", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = ColorPrimary)
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -129,20 +140,63 @@ fun QrConfirmScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            if (errorMessage != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ColorErrorBg)
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "\u26A0",
+                        fontSize = 16.sp,
+                        color = ColorErrorRed
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = errorMessage,
+                        fontSize = 13.sp,
+                        color = ColorErrorRed,
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Text(
+                text = "Este código garantiza que se está conectando al dispositivo correcto para el monitoreo de tu salud.",
+                fontSize = 14.sp,
+                color = ColorTextSecondary,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Button(
                 onClick = onConfirm,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
+                colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
+                enabled = !isLoading
             ) {
-                Text(
-                    text = "Confirmar y Vincular",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Confirmar y Vincular",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -150,6 +204,7 @@ fun QrConfirmScreen(
             Button(
                 onClick = onCancel,
                 modifier = Modifier.height(44.dp),
+                enabled = !isLoading,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
             ) {
                 Text(text = "Cancelar", fontSize = 14.sp, color = ColorTextSecondary)

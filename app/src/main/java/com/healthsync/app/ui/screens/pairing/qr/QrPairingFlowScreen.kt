@@ -88,7 +88,9 @@ fun QrPairingFlowScreen(
                             onConfirm = { viewModel.onConfirm() },
                             onCancel = { viewModel.onCancel() },
                             deviceName = state.deviceName,
-                            scannedCode = state.scannedCode ?: state.qrCodeData
+                            scannedCode = state.scannedCode ?: state.qrCodeData,
+                            isLoading = state.isLoading,
+                            errorMessage = state.networkError
                         )
                     }
                     is QrPairingStep.Syncing,
