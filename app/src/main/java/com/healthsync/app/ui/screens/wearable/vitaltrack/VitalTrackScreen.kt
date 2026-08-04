@@ -1,0 +1,193 @@
+package com.healthsync.app.ui.screens.wearable.vitaltrack
+
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.healthsync.app.ui.components.AppCard
+import com.healthsync.app.ui.components.WearableFrame
+import com.healthsync.app.ui.components.WearableTheme
+import com.healthsync.app.ui.theme.ColorBgPage
+import com.healthsync.app.ui.theme.ColorPrimary
+import com.healthsync.app.ui.theme.ColorSuccessGreen
+import com.healthsync.app.ui.theme.ColorTextMuted
+import com.healthsync.app.ui.theme.ColorTextPrimary
+import com.healthsync.app.ui.theme.ColorTextSecondary
+import com.healthsync.app.ui.theme.ColorVtBg
+import com.healthsync.app.ui.theme.ColorVtRingSuccess
+import com.healthsync.app.ui.theme.ColorVtRingWarning
+import com.healthsync.app.ui.theme.ColorWearableRingAccentBlue
+import com.healthsync.app.ui.theme.ColorWearableRingAccentTeal
+import com.healthsync.app.ui.theme.ColorWearableText
+import com.healthsync.app.ui.theme.ColorWearableTextMuted
+
+@Composable
+fun VitalTrackScreen(
+    onBack: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ColorVtBg)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ColorVtBg)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "<",
+                fontSize = 18.sp,
+                color = ColorWearableTextMuted,
+                modifier = Modifier.padding(end = 12.dp)
+            )
+            Text(
+                text = "VitalTrack",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = ColorWearableText
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            WearableFrame(
+                theme = WearableTheme.Dark,
+                label = "MONITOREO EN VIVO",
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "\u2665",
+                        fontSize = 48.sp,
+                        color = ColorWearableRingAccentTeal
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "72",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorWearableText
+                    )
+                    Text(
+                        text = "lpm",
+                        fontSize = 14.sp,
+                        color = ColorWearableTextMuted
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("O2", fontSize = 10.sp, color = ColorWearableTextMuted)
+                            Text("98%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorWearableText)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("PAS", fontSize = 10.sp, color = ColorWearableTextMuted)
+                            Text("120", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorWearableText)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Signos Vitales",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorTextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    VitalSignRow("Frecuencia cardíaca", "72 lpm", "Normal", ColorSuccessGreen)
+                    VitalSignRow("Saturación O2", "98%", "Normal", ColorSuccessGreen)
+                    VitalSignRow("Presión arterial", "120/80", "Normal", ColorSuccessGreen)
+                    VitalSignRow("Temperatura", "36.5°C", "Normal", ColorSuccessGreen)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Los datos mostrados son simulados. Conecta tu Dialitech Watch Pro para obtener lecturas reales.",
+                fontSize = 12.sp,
+                color = ColorTextMuted,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun VitalSignRow(label: String, value: String, status: String, statusColor: Color) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            fontSize = 13.sp,
+            color = ColorTextSecondary,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = ColorTextPrimary,
+            modifier = Modifier.padding(end = 12.dp)
+        )
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(9999.dp))
+                .background(statusColor.copy(alpha = 0.1f))
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = status,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                color = statusColor
+            )
+        }
+    }
+}
