@@ -35,7 +35,7 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem("Home", Icons.Default.Home, Routes.Dashboard.route),
-    BottomNavItem("Dispositivos", Icons.Default.Watch, Routes.QrPairingFlow.route),
+    BottomNavItem("Dispositivos", Icons.Default.Watch, Routes.PairingMethod.route),
     BottomNavItem("Actividad", Icons.Default.MonitorHeart, Routes.Activity.route),
     BottomNavItem("Perfil", Icons.Default.Person, Routes.Profile.route)
 )

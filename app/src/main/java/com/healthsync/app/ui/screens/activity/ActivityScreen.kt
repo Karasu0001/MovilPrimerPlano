@@ -136,7 +136,7 @@ fun ActivityScreen(
             onItemClick = { route ->
                 when (route) {
                     Routes.Dashboard.route -> onNavigateToDashboard()
-                    Routes.QrPairingFlow.route -> onNavigateToPairing()
+                    Routes.PairingMethod.route -> onNavigateToPairing()
                     Routes.Activity.route -> Unit
                     Routes.Profile.route -> onNavigateToProfile()
                     else -> Unit

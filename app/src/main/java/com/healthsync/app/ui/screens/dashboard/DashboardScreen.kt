@@ -249,7 +249,7 @@ fun DashboardScreen(
         activeRoute = Routes.Dashboard.route,
         onItemClick = { route ->
             when (route) {
-                Routes.QrPairingFlow.route -> onNavigateToPairing()
+                Routes.PairingMethod.route -> onNavigateToPairing()
                 Routes.Activity.route -> onNavigateToActivity()
                 Routes.Profile.route -> onNavigateToProfile()
                 else -> Unit

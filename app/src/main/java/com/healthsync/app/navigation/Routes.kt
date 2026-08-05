@@ -13,6 +13,7 @@ sealed class Routes(val route: String) {
     object CodePairingSuccess : Routes("pairing/code/success")
     object CodePairingCancelled : Routes("pairing/code/cancelled")
     object QrPairingFlow : Routes("pairing/qr/flow")
+    object PairingMethod : Routes("pairing/method")
     object VitalTrackFlow : Routes("vitaltrack/flow")
     object Activity : Routes("activity")
     object Profile : Routes("profile")

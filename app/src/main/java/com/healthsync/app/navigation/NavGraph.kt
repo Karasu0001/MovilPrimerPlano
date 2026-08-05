@@ -16,6 +16,7 @@ import com.healthsync.app.ui.screens.auth.LoginScreen
 import com.healthsync.app.ui.screens.auth.RegisterScreen
 import com.healthsync.app.ui.screens.dashboard.DashboardScreen
 import com.healthsync.app.ui.screens.onboarding.WelcomeScreen
+import com.healthsync.app.ui.screens.pairing.PairingMethodScreen
 import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
 import com.healthsync.app.ui.screens.pairing.qr.QrPairingFlowScreen
 import com.healthsync.app.ui.screens.profile.ProfileScreen
@@ -71,10 +72,18 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.Dashboard.route) {
             DashboardScreen(
-                onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
+                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToActivity = { navController.navigate(Routes.Activity.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) },
                 onNavigateToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) }
+            )
+        }
+
+        composable(Routes.PairingMethod.route) {
+            PairingMethodScreen(
+                onSelectCode = { navController.navigate(Routes.CodePairingFlow.route) },
+                onSelectQr = { navController.navigate(Routes.QrPairingFlow.route) },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -102,7 +111,7 @@ fun NavGraph(navController: NavHostController) {
             ActivityScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
-                onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
+                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) }
             )
         }
@@ -116,7 +125,7 @@ fun NavGraph(navController: NavHostController) {
                     }
                 },
                 onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
-                onNavigateToPairing = { navController.navigate(Routes.QrPairingFlow.route) },
+                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToActivity = { navController.navigate(Routes.Activity.route) }
             )
         }

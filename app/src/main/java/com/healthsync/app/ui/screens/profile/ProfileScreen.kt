@@ -148,7 +148,7 @@ fun ProfileScreen(
             onItemClick = { route ->
                 when (route) {
                     Routes.Dashboard.route -> onNavigateToDashboard()
-                    Routes.QrPairingFlow.route -> onNavigateToPairing()
+                    Routes.PairingMethod.route -> onNavigateToPairing()
                     Routes.Activity.route -> onNavigateToActivity()
                     Routes.Profile.route -> Unit
                     else -> Unit
