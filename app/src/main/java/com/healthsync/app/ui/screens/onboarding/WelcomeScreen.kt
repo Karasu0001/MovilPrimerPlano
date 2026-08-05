@@ -57,28 +57,6 @@ fun WelcomeScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
-        // Botón Ayuda (esquina superior derecha)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Button(
-                onClick = onHelpClick,
-                shape = RoundedCornerShape(9999.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = ColorBadgeHelpBg),
-                modifier = Modifier.height(36.dp)
-            ) {
-                Text(
-                    text = "Ayuda",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
         // Hero visual
         Box(
             modifier = Modifier
