@@ -65,13 +65,16 @@ object ApiClient {
         json.decodeFromString(serializer, body)
     }
 
-    suspend fun <T, R> post(path: String, body: T, bodySerializer: KSerializer<T>, responseSerializer: KSerializer<R>): R = withContext(Dispatchers.IO) {
+    suspend fun <T, R> post(path: String, body: T, bodySerializer: KSerializer<T>, responseSerializer: KSerializer<R>, token: String? = null): R = withContext(Dispatchers.IO) {
         val jsonString = json.encodeToString(bodySerializer, body)
         val requestBody = jsonString.toRequestBody(mediaType)
-        val request = Request.Builder()
+        val requestBuilder = Request.Builder()
             .url(BASE_URL + path)
             .post(requestBody)
-            .build()
+        if (token != null) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+        val request = requestBuilder.build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
             val respBody = response.body?.string().orEmpty()
@@ -79,5 +82,22 @@ object ApiClient {
         }
         val responseBody = response.body?.string() ?: throw java.io.IOException("Empty body")
         json.decodeFromString(responseSerializer, responseBody)
+    }
+
+    suspend fun <T> delete(path: String, serializer: KSerializer<T>, token: String? = null): T = withContext(Dispatchers.IO) {
+        val requestBuilder = Request.Builder()
+            .url(BASE_URL + path)
+            .delete()
+        if (token != null) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+        val request = requestBuilder.build()
+        val response = client.newCall(request).execute()
+        if (!response.isSuccessful) {
+            val body = response.body?.string().orEmpty()
+            throw ApiException(response.code, body)
+        }
+        val body = response.body?.string() ?: throw java.io.IOException("Empty body")
+        json.decodeFromString(serializer, body)
     }
 }

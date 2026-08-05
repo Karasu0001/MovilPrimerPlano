@@ -48,6 +48,7 @@ import com.healthsync.app.ui.theme.ColorTextSecondary
 fun WelcomeScreen(
     onStart: () -> Unit = {},
     onLoginClick: () -> Unit = {},
+    onPairingMethod: () -> Unit = {},
     onHelpClick: () -> Unit = {}
 ) {
     Column(
@@ -166,6 +167,21 @@ fun WelcomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onLoginClick() }
+                .padding(vertical = 12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Link Vincular con código
+        Text(
+            text = "Ya tengo un c\u00f3digo de vinculaci\u00f3n",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = ColorPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onPairingMethod() }
                 .padding(vertical = 12.dp)
         )
 

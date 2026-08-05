@@ -15,6 +15,9 @@ import com.healthsync.app.ui.screens.auth.ForgotPasswordScreen
 import com.healthsync.app.ui.screens.auth.LoginScreen
 import com.healthsync.app.ui.screens.auth.RegisterScreen
 import com.healthsync.app.ui.screens.dashboard.DashboardScreen
+import com.healthsync.app.ui.screens.patient.PatientDetailScreen
+import com.healthsync.app.ui.screens.patient.CreatePatientScreen
+import com.healthsync.app.ui.screens.alerts.AlertsScreen
 import com.healthsync.app.ui.screens.onboarding.WelcomeScreen
 import com.healthsync.app.ui.screens.pairing.PairingMethodScreen
 import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
@@ -43,7 +46,8 @@ fun NavGraph(navController: NavHostController) {
             if (sessionChecked) {
                 WelcomeScreen(
                     onStart = { navController.navigate(Routes.Register.route) },
-                    onLoginClick = { navController.navigate(Routes.Login.route) }
+                    onLoginClick = { navController.navigate(Routes.Login.route) },
+                    onPairingMethod = { navController.navigate(Routes.PairingMethod.route) }
                 )
             }
         }
@@ -75,7 +79,33 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToActivity = { navController.navigate(Routes.Activity.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) },
-                onNavigateToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) }
+                onNavigateToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) },
+                onNavigateToPatientDetail = { patientId ->
+                    navController.navigate("detail/$patientId")
+                },
+                onNavigateToCreatePatient = { navController.navigate(Routes.CreatePatient.route) },
+                onNavigateToAlerts = { navController.navigate(Routes.Alerts.route) }
+            )
+        }
+
+        composable("detail/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+            PatientDetailScreen(
+                patientId = patientId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.CreatePatient.route) {
+            CreatePatientScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.Alerts.route) {
+            AlertsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToPatientDetail = { patientId -> navController.navigate("detail/$patientId") }
             )
         }
 
@@ -89,14 +119,20 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.CodePairingFlow.route) {
             CodePairingFlowScreen(
-                onGoToDashboard = { navController.navigate(Routes.Dashboard.route) },
+                onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
+                    popUpTo(Routes.CodePairingFlow.route) { inclusive = true }
+                    popUpTo(Routes.PairingMethod.route) { inclusive = true }
+                }},
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable(Routes.QrPairingFlow.route) {
             QrPairingFlowScreen(
-                onGoToDashboard = { navController.navigate(Routes.Dashboard.route) },
+                onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
+                    popUpTo(Routes.QrPairingFlow.route) { inclusive = true }
+                    popUpTo(Routes.PairingMethod.route) { inclusive = true }
+                }},
                 onBack = { navController.popBackStack() }
             )
         }
@@ -125,8 +161,7 @@ fun NavGraph(navController: NavHostController) {
                     }
                 },
                 onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
-                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
-                onNavigateToActivity = { navController.navigate(Routes.Activity.route) }
+                onNavigateToAlerts = { navController.navigate(Routes.Alerts.route) }
             )
         }
     }

@@ -47,8 +47,7 @@ fun ProfileScreen(
     onBack: () -> Unit = {},
     onLogout: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
-    onNavigateToPairing: () -> Unit = {},
-    onNavigateToActivity: () -> Unit = {}
+    onNavigateToAlerts: () -> Unit = {}
 ) {
     val profileViewModel: ProfileViewModel = viewModel()
     val uiState by profileViewModel.uiState.collectAsState()
@@ -148,8 +147,7 @@ fun ProfileScreen(
             onItemClick = { route ->
                 when (route) {
                     Routes.Dashboard.route -> onNavigateToDashboard()
-                    Routes.PairingMethod.route -> onNavigateToPairing()
-                    Routes.Activity.route -> onNavigateToActivity()
+                    Routes.Alerts.route -> onNavigateToAlerts()
                     Routes.Profile.route -> Unit
                     else -> Unit
                 }

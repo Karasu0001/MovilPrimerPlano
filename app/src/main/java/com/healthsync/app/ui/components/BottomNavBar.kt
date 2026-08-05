@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,8 +34,7 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem("Home", Icons.Default.Home, Routes.Dashboard.route),
-    BottomNavItem("Dispositivos", Icons.Default.Watch, Routes.PairingMethod.route),
-    BottomNavItem("Actividad", Icons.Default.MonitorHeart, Routes.Activity.route),
+    BottomNavItem("Alertas", Icons.Default.Warning, Routes.Alerts.route),
     BottomNavItem("Perfil", Icons.Default.Person, Routes.Profile.route)
 )
 
