@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -62,12 +61,9 @@ fun BrandLogo(
                     .background(ColorLogoBg),
                 contentAlignment = Alignment.Center
             ) {
-                // TODO: reemplazar por asset de marca (Cross)
-                Text(
-                    text = "+",
-                    color = Color.White,
-                    fontSize = (iconSize.value / 2.5f).sp,
-                    fontWeight = FontWeight.Bold
+                HealthPulseIcon(
+                    modifier = Modifier.size(iconSize * 0.7f),
+                    tint = Color.White
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
