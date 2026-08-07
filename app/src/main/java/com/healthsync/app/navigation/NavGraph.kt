@@ -25,6 +25,7 @@ import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
 import com.healthsync.app.ui.screens.pairing.qr.QrPairingFlowScreen
 import com.healthsync.app.ui.screens.profile.ProfileScreen
 import com.healthsync.app.ui.screens.wearable.vitaltrack.VitalTrackScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -128,8 +129,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.CodePairingFlow.route) {
             CodePairingFlowScreen(
                 onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
-                    popUpTo(Routes.CodePairingFlow.route) { inclusive = true }
-                    popUpTo(Routes.PairingMethod.route) { inclusive = true }
+                    popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
             )
@@ -138,16 +138,31 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.QrPairingFlow.route) {
             QrPairingFlowScreen(
                 onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
-                    popUpTo(Routes.QrPairingFlow.route) { inclusive = true }
-                    popUpTo(Routes.PairingMethod.route) { inclusive = true }
+                    popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable(Routes.VitalTrackFlow.route) {
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
             VitalTrackScreen(
-                onBack = { navController.popBackStack() }
+                onBack = {
+                    if (navController.previousBackStackEntry == null) {
+                        // Se llegó acá sin nada atrás (flujo de paciente sin cuenta):
+                        // salir de verdad significa terminar la sesión local, si no
+                        // Welcome te va a rebotar de nuevo hacia acá.
+                        scope.launch {
+                            PatientSessionStore.clearPatientSession()
+                            navController.navigate(Routes.Welcome.route) {
+                                popUpTo(0)
+                            }
+                        }
+                    } else {
+                        // Se llegó desde el Dashboard del cuidador: volver normal.
+                        navController.popBackStack()
+                    }
+                }
             )
         }
 

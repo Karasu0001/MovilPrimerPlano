@@ -1,9 +1,8 @@
 package com.healthsync.app.ui.screens.wearable.vitaltrack
 
-
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,8 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,30 +27,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.healthsync.app.ui.components.AppCard
-import com.healthsync.app.ui.components.WearableFrame
-import com.healthsync.app.ui.components.WearableTheme
+import com.healthsync.app.ui.components.StatCard
 import com.healthsync.app.ui.theme.ColorBgPage
+import com.healthsync.app.ui.theme.ColorErrorRed
 import com.healthsync.app.ui.theme.ColorPrimary
 import com.healthsync.app.ui.theme.ColorSuccessGreen
 import com.healthsync.app.ui.theme.ColorTextMuted
 import com.healthsync.app.ui.theme.ColorTextPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
-import com.healthsync.app.ui.theme.ColorVtBg
-import com.healthsync.app.ui.theme.ColorVtRingSuccess
-import com.healthsync.app.ui.theme.ColorVtRingWarning
-import com.healthsync.app.ui.theme.ColorWearableRingAccentBlue
-import com.healthsync.app.ui.theme.ColorWearableRingAccentTeal
-import com.healthsync.app.ui.theme.ColorWearableText
-import com.healthsync.app.ui.theme.ColorWearableTextMuted
 import com.healthsync.app.viewmodel.VitalTrackViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun VitalTrackScreen(
@@ -59,29 +56,33 @@ fun VitalTrackScreen(
         vitalTrackViewModel.clearNetworkError()
     }
 
+    val today = SimpleDateFormat("EEEE d 'de' MMMM", Locale("es")).format(Date())
+        .replaceFirstChar { it.uppercase() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorVtBg)
+            .background(ColorBgPage)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(ColorVtBg)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "<",
                 fontSize = 18.sp,
-                color = ColorWearableTextMuted,
-                modifier = Modifier.padding(end = 12.dp)
+                color = ColorTextMuted,
+                modifier = Modifier
+                    .clickable { onBack() }
+                    .padding(end = 12.dp)
             )
             Text(
                 text = "VitalTrack",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = ColorWearableText
+                color = ColorTextPrimary
             )
         }
 
@@ -89,143 +90,113 @@ fun VitalTrackScreen(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.Start
         ) {
-            WearableFrame(
-                theme = WearableTheme.Dark,
-                label = "MONITOREO EN VIVO",
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Hola, ${uiState.patientName ?: ""}".trimEnd(),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = ColorPrimary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = today,
+                fontSize = 14.sp,
+                color = ColorTextSecondary
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (uiState.isLoading && !uiState.hasRealData) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+                    CircularProgressIndicator(color = ColorPrimary)
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "\u2665",
-                        fontSize = 48.sp,
-                        color = ColorWearableRingAccentTeal
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = uiState.heartRate ?: "--",
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorWearableText
-                    )
-                    Text(
-                        text = "lpm",
+                        text = "Cargando datos...",
                         fontSize = 14.sp,
-                        color = ColorWearableTextMuted
+                        color = ColorTextMuted
                     )
-                    if (uiState.oxygenSaturation != null) {
-                        val o2 = uiState.oxygenSaturation
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("O2", fontSize = 10.sp, color = ColorWearableTextMuted)
-                            Text(
-                                text = o2 ?: "",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = ColorWearableText
-                            )
-                        }
+                }
+            } else {
+                val networkError = uiState.networkError
+                if (networkError != null && !uiState.hasRealData) {
+                    Text(
+                        text = networkError,
+                        fontSize = 13.sp,
+                        color = ColorErrorRed,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        StatCard(
+                            icon = Icons.Default.Favorite,
+                            value = uiState.heartRate ?: "--",
+                            label = "Frec. card\u00edaca",
+                            accentColor = ColorErrorRed,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatCard(
+                            icon = Icons.Default.WaterDrop,
+                            value = uiState.oxygenSaturation?.let { "$it%" } ?: "--",
+                            label = "Saturaci\u00f3n O2",
+                            accentColor = ColorPrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        StatCard(
+                            icon = Icons.AutoMirrored.Filled.DirectionsRun,
+                            value = uiState.lastActivity ?: "--",
+                            label = "Actividad",
+                            accentColor = ColorSuccessGreen,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatCard(
+                            icon = Icons.Default.AccessTime,
+                            value = uiState.lastReadingAt?.let { formatReadingTime(it) } ?: "--",
+                            label = "\u00daltima lectura",
+                            accentColor = ColorTextSecondary,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            AppCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Signos Vitales",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorTextPrimary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    VitalSignRow(
-                        "Frecuencia card\u00edaca",
-                        uiState.heartRate?.let { "$it lpm" } ?: "--",
-                        if (uiState.heartRate != null) "Normal" else "Sin datos",
-                        if (uiState.heartRate != null) ColorSuccessGreen else ColorVtRingWarning
-                    )
-                    VitalSignRow(
-                        "Saturaci\u00f3n O2",
-                        uiState.oxygenSaturation?.let { "$it%" } ?: "--",
-                        if (uiState.oxygenSaturation != null) "Normal" else "Sin datos",
-                        if (uiState.oxygenSaturation != null) ColorSuccessGreen else ColorVtRingWarning
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            val networkError = uiState.networkError
-            if (networkError != null) {
-                Text(
-                    text = networkError,
-                    fontSize = 12.sp,
-                    color = ColorTextMuted,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            } else if (uiState.hasRealData) {
-                Text(
-                    text = "Datos obtenidos del dispositivo vinculado.",
-                    fontSize = 12.sp,
-                    color = ColorTextMuted,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            } else {
-                Text(
-                    text = "Todav\u00eda no hay lecturas de este paciente.",
-                    fontSize = 12.sp,
-                    color = ColorTextMuted,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
-@Composable
-private fun VitalSignRow(label: String, value: String, status: String, statusColor: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            fontSize = 13.sp,
-            color = ColorTextSecondary,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = value,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = ColorTextPrimary,
-            modifier = Modifier.padding(end = 12.dp)
-        )
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(9999.dp))
-                .background(statusColor.copy(alpha = 0.1f))
-                .padding(horizontal = 8.dp, vertical = 2.dp)
-        ) {
-            Text(
-                text = status,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-                color = statusColor
-            )
+private fun formatReadingTime(iso: String): String {
+    return try {
+        val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
         }
+        // El output usa la zona horaria local del dispositivo (default de SimpleDateFormat),
+        // así que esto convierte de UTC (lo que manda la API) a la hora local del paciente.
+        val output = SimpleDateFormat("HH:mm", Locale.US)
+        val date = input.parse(iso) ?: return iso
+        output.format(date)
+    } catch (_: Exception) {
+        iso.take(16)
     }
 }

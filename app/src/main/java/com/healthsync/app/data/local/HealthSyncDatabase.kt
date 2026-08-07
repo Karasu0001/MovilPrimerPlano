@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [PatientEntity::class, ReadingEntity::class, AlertEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class HealthSyncDatabase : RoomDatabase() {
