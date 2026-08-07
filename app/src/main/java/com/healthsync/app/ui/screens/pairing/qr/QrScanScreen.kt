@@ -181,34 +181,37 @@ private fun CameraPreview(
             val executor = java.util.concurrent.Executors.newSingleThreadExecutor()
             analysisExecutor = executor
 
-            imageAnalysis.setAnalyzer(executor) { imageProxy ->
-                val mediaImage = imageProxy.image
-                if (mediaImage != null) {
-                    val rotation = imageProxy.imageInfo.rotationDegrees
-                    val inputImage = InputImage.fromMediaImage(mediaImage, rotation)
+            imageAnalysis.setAnalyzer(executor, object : ImageAnalysis.Analyzer {
+                @androidx.camera.core.ExperimentalGetImage
+                override fun analyze(imageProxy: ImageProxy) {
+                    val mediaImage = imageProxy.image
+                    if (mediaImage != null) {
+                        val rotation = imageProxy.imageInfo.rotationDegrees
+                        val inputImage = InputImage.fromMediaImage(mediaImage, rotation)
 
-                    scanner.process(inputImage)
-                        .addOnSuccessListener { barcodes ->
-                            if (isDetecting.get()) return@addOnSuccessListener
-                            for (barcode in barcodes) {
-                                barcode.rawValue?.let { qrValue ->
-                                    isDetecting.set(true)
-                                    onQrDetected(qrValue)
-                                    provider.unbindAll()
-                                    executor.shutdown()
-                                    imageProxy.close()
-                                    return@addOnSuccessListener
+                        scanner.process(inputImage)
+                            .addOnSuccessListener { barcodes ->
+                                if (isDetecting.get()) return@addOnSuccessListener
+                                for (barcode in barcodes) {
+                                    barcode.rawValue?.let { qrValue ->
+                                        isDetecting.set(true)
+                                        onQrDetected(qrValue)
+                                        provider.unbindAll()
+                                        executor.shutdown()
+                                        imageProxy.close()
+                                        return@addOnSuccessListener
+                                    }
                                 }
+                                imageProxy.close()
                             }
-                            imageProxy.close()
-                        }
-                        .addOnFailureListener {
-                            imageProxy.close()
-                        }
-                } else {
-                    imageProxy.close()
+                            .addOnFailureListener {
+                                imageProxy.close()
+                            }
+                    } else {
+                        imageProxy.close()
+                    }
                 }
-            }
+            })
 
             try {
                 provider.unbindAll()
