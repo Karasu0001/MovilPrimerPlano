@@ -59,7 +59,11 @@ fun CodePairingFlowScreen(
         ) {
             when (val step = state.step) {
                 is PairingStep.Searching -> {
-                    BuscandoDispositivoScreen(onConnect = { viewModel.onConnect() })
+                    IngresarCodigoScreen(
+                        pairingCode = state.pairingCode,
+                        onPairingCodeChanged = { viewModel.onPairingCodeChanged(it) },
+                        onContinue = { viewModel.onConnect() }
+                    )
                 }
                 is PairingStep.Confirming -> {
                     ConfirmarEmparejamientoScreen(

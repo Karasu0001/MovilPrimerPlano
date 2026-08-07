@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -61,7 +59,6 @@ private const val TAG = "QrScanScreen"
 @Composable
 fun QrScanScreen(
     onQrScanned: (String) -> Unit,
-    onSimulateScan: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -136,47 +133,11 @@ fun QrScanScreen(
                 color = ColorTextPrimary
             )
             Text(
-                text = "Enfoca el c\u00f3digo QR que se muestra en tu Dialitech Watch Pro.",
+                text = "Enfoca el c\u00f3digo QR que se muestra en tu dispositivo.",
                 fontSize = 14.sp,
                 color = ColorTextSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "A\u00fan no puedes escanear?",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = ColorTextSecondary
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = onSimulateScan,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
-            ) {
-                Text(
-                    text = "Simular escaneo",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Pulsa este bot\u00f3n para simular el escaneo del QR (modo desarrollo).",
-                fontSize = 11.sp,
-                color = ColorTextMuted,
-                textAlign = TextAlign.Center
             )
         }
     }

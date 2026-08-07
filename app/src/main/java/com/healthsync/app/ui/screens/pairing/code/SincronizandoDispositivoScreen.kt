@@ -98,7 +98,7 @@ fun SincronizandoDispositivoScreen(
                 color = ColorTextPrimary
             )
             Text(
-                text = "Vinculando la Dialitech Watch Pro mediante Bluetooth...",
+                text = "Vinculando el dispositivo mediante Bluetooth...",
                 fontSize = 14.sp,
                 color = ColorTextSecondary,
                 textAlign = TextAlign.Center

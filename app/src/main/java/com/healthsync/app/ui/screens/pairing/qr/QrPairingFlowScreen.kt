@@ -66,7 +66,6 @@ fun QrPairingFlowScreen(
                 is QrPairingStep.Scanning -> {
                     QrScanScreen(
                         onQrScanned = { viewModel.onQrScanned(it) },
-                        onSimulateScan = { viewModel.onSimulateScan() },
                         onBack = onBack
                     )
                 }

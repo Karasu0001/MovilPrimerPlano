@@ -124,7 +124,7 @@ fun QrSuccessScreen(
                             }
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Dialitech Watch Pro",
+                                text = "Dispositivo",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = ColorTextPrimary

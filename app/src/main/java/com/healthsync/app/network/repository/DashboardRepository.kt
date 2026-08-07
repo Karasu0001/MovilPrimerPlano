@@ -3,6 +3,10 @@ package com.healthsync.app.network.repository
 import com.healthsync.app.network.ApiException
 import com.healthsync.app.network.ApiClient
 import com.healthsync.app.network.NetworkResult
+import com.healthsync.app.data.local.HealthSyncDb
+import com.healthsync.app.data.local.PatientEntity
+import com.healthsync.app.data.local.ReadingEntity
+import com.healthsync.app.data.local.AlertEntity
 import com.healthsync.app.network.response.AlertDto
 import com.healthsync.app.network.response.CreatePatientRequest
 import com.healthsync.app.network.response.DashboardSummaryResponse
@@ -23,6 +27,23 @@ class DashboardRepository {
                 DashboardSummaryResponse.serializer(),
                 token
             )
+            val now = System.currentTimeMillis()
+            HealthSyncDb.patientDao().upsertAll(response.patients.map { p ->
+                PatientEntity(
+                    patientId = p.patientId,
+                    name = p.name,
+                    age = null,
+                    gender = null,
+                    notes = null,
+                    hasDevice = p.hasDevice,
+                    deviceSerialNumber = null,
+                    lastHeartRate = p.lastHeartRate,
+                    lastOxygen = p.lastOxygen,
+                    lastActivity = p.lastActivity,
+                    lastReadingAt = p.lastReadingAt,
+                    updatedAt = now
+                )
+            })
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {
@@ -46,6 +67,22 @@ class DashboardRepository {
                 "api/v1/dashboard/$patientId",
                 PatientDetailResponse.serializer(),
                 token
+            )
+            HealthSyncDb.patientDao().upsert(
+                PatientEntity(
+                    patientId = response.patientId,
+                    name = response.name,
+                    age = response.age,
+                    gender = response.gender,
+                    notes = response.notes,
+                    hasDevice = response.hasDevice,
+                    deviceSerialNumber = null,
+                    lastHeartRate = response.lastHeartRate,
+                    lastOxygen = response.lastOxygen,
+                    lastActivity = response.lastActivity,
+                    lastReadingAt = response.lastReadingAt,
+                    updatedAt = System.currentTimeMillis()
+                )
             )
             NetworkResult.Success(response)
         } catch (e: ApiException) {
@@ -72,6 +109,17 @@ class DashboardRepository {
                 ReadingsResponse.serializer(),
                 token
             )
+            val now = System.currentTimeMillis()
+            HealthSyncDb.readingDao().upsertAll(response.readings.map { r ->
+                ReadingEntity(
+                    patientId = patientId,
+                    timestamp = r.timestamp ?: "",
+                    heartRate = r.heartRate,
+                    oxygen = r.oxygen,
+                    activity = r.activity,
+                    recordedAt = now
+                )
+            })
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {
@@ -149,6 +197,18 @@ class DashboardRepository {
                 kotlinx.serialization.builtins.ListSerializer(AlertDto.serializer()),
                 token
             )
+            HealthSyncDb.alertDao().upsertAll(response.map { a ->
+                AlertEntity(
+                    id = a.id,
+                    patientId = a.patientId,
+                    patientName = a.patientName,
+                    type = a.type,
+                    message = a.message,
+                    severity = a.severity,
+                    isRead = a.isRead,
+                    createdAt = a.createdAt
+                )
+            })
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {
@@ -173,6 +233,18 @@ class DashboardRepository {
                 kotlinx.serialization.builtins.ListSerializer(AlertDto.serializer()),
                 token
             )
+            HealthSyncDb.alertDao().upsertAll(response.map { a ->
+                AlertEntity(
+                    id = a.id,
+                    patientId = a.patientId,
+                    patientName = a.patientName,
+                    type = a.type,
+                    message = a.message,
+                    severity = a.severity,
+                    isRead = a.isRead,
+                    createdAt = a.createdAt
+                )
+            })
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {

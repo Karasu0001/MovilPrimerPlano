@@ -91,7 +91,7 @@ fun WearableShowQrContent(
 
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Dialitech Watch Pro",
+            text = "Dispositivo",
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = ColorWearableText
@@ -125,7 +125,7 @@ fun WearableQrConfirmContent(
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "Dialitech App",
+            text = "Dialitech",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = ColorWearableText

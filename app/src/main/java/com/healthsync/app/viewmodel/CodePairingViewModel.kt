@@ -24,12 +24,10 @@ sealed class PairingStep {
 
 data class CodePairingUiState(
     val step: PairingStep = PairingStep.Searching,
-    val pairingCode: String = "458921",
-    val deviceName: String = "Dialitech Watch Pro",
-    val deviceModel: String = "DL-W3",
+    val pairingCode: String = "",
+    val deviceName: String = "Dispositivo",
+    val deviceModel: String = "",
     val deviceSerialNumber: String = "",
-    val signalStrength: String = "Señal Excelente",
-    val batteryLevel: String = "85%",
     val isLoading: Boolean = false,
     val networkError: String? = null,
     val patientCode: String? = null
@@ -41,6 +39,11 @@ class CodePairingViewModel : ViewModel() {
 
     var uiState by mutableStateOf(CodePairingUiState())
         private set
+
+    fun onPairingCodeChanged(value: String) {
+        val digitsOnly = value.filter { it.isDigit() }.take(6)
+        uiState = uiState.copy(pairingCode = digitsOnly, networkError = null)
+    }
 
     fun onConnect() {
         uiState = uiState.copy(step = PairingStep.Confirming)

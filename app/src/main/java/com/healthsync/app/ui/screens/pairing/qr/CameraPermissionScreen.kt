@@ -107,7 +107,7 @@ fun CameraPermissionScreen(
                 color = ColorTextPrimary
             )
             Text(
-                text = "Necesitamos acceder a tu c\u00e1mara para escanear el c\u00f3digo QR en tu Dialitech Watch Pro.",
+                text = "Necesitamos acceder a tu c\u00e1mara para escanear el c\u00f3digo QR de tu dispositivo.",
                 fontSize = 14.sp,
                 color = ColorTextSecondary,
                 textAlign = TextAlign.Center,

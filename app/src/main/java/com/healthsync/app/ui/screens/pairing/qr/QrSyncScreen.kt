@@ -96,7 +96,7 @@ fun QrSyncScreen(
                 color = ColorTextPrimary
             )
             Text(
-                text = "Vinculando la Dialitech Watch Pro mediante QR...",
+                text = "Vinculando el dispositivo mediante QR...",
                 fontSize = 14.sp,
                 color = ColorTextSecondary,
                 textAlign = TextAlign.Center

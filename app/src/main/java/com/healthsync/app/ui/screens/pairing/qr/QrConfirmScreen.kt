@@ -43,7 +43,7 @@ fun QrConfirmScreen(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
-    deviceName: String = "Dialitech Watch Pro",
+    deviceName: String = "Dispositivo",
     scannedCode: String = "",
     isLoading: Boolean = false,
     errorMessage: String? = null

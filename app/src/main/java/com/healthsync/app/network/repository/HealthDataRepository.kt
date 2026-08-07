@@ -4,6 +4,9 @@ import com.healthsync.app.network.ApiException
 import com.healthsync.app.network.ApiClient
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.RateLimiter
+import com.healthsync.app.data.local.HealthSyncDb
+import com.healthsync.app.data.local.PatientEntity
+import com.healthsync.app.data.local.ReadingEntity
 import com.healthsync.app.network.request.BatchHealthDataRequest
 import com.healthsync.app.network.request.BatchDataPoint
 import com.healthsync.app.network.response.BatchHealthDataResponse
@@ -30,6 +33,17 @@ class HealthDataRepository {
                 BatchHealthDataRequest.serializer(),
                 BatchHealthDataResponse.serializer()
             )
+            val now = System.currentTimeMillis()
+            HealthSyncDb.readingDao().upsertAll(data.map { dp ->
+                ReadingEntity(
+                    patientId = patientCode,
+                    timestamp = dp.timestamp,
+                    heartRate = dp.heartRate.toInt(),
+                    oxygen = dp.oxygen.toInt(),
+                    activity = dp.activity.toInt(),
+                    recordedAt = now
+                )
+            })
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {
@@ -53,6 +67,35 @@ class HealthDataRepository {
                 "api/v1/health-data/patient-info/$patientCode",
                 PatientInfoResponse.serializer()
             )
+            val now = System.currentTimeMillis()
+            HealthSyncDb.patientDao().upsert(
+                PatientEntity(
+                    patientId = response.patientCode ?: patientCode,
+                    name = response.name ?: "",
+                    age = null,
+                    gender = null,
+                    notes = null,
+                    hasDevice = response.deviceSerialNumber != null,
+                    deviceSerialNumber = response.deviceSerialNumber,
+                    lastHeartRate = response.lastHeartRate,
+                    lastOxygen = response.lastOxygen,
+                    lastActivity = response.lastActivity,
+                    lastReadingAt = response.lastReadingAt,
+                    updatedAt = now
+                )
+            )
+            if (response.lastHeartRate != null || response.lastOxygen != null || response.lastActivity != null) {
+                HealthSyncDb.readingDao().upsert(
+                    ReadingEntity(
+                        patientId = response.patientCode ?: patientCode,
+                        timestamp = response.lastReadingAt ?: "",
+                        heartRate = response.lastHeartRate,
+                        oxygen = response.lastOxygen,
+                        activity = response.lastActivity,
+                        recordedAt = now
+                    )
+                )
+            }
             NetworkResult.Success(response)
         } catch (e: ApiException) {
             when (e.httpCode) {

@@ -109,7 +109,7 @@ fun VitalTrackScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = uiState.heartRate ?: "72",
+                        text = uiState.heartRate ?: "--",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorWearableText
@@ -119,22 +119,17 @@ fun VitalTrackScreen(
                         fontSize = 14.sp,
                         color = ColorWearableTextMuted
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
+                    if (uiState.oxygenSaturation != null) {
+                        val o2 = uiState.oxygenSaturation
+                        Spacer(modifier = Modifier.height(16.dp))
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("O2", fontSize = 10.sp, color = ColorWearableTextMuted)
                             Text(
-                                text = uiState.oxygenSaturation ?: "98%",
+                                text = o2 ?: "",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ColorWearableText
                             )
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("PAS", fontSize = 10.sp, color = ColorWearableTextMuted)
-                            Text("120", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorWearableText)
                         }
                     }
                 }
@@ -152,19 +147,17 @@ fun VitalTrackScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     VitalSignRow(
-                        "Frecuencia cardíaca",
-                        uiState.heartRate ?: "72 lpm",
+                        "Frecuencia card\u00edaca",
+                        uiState.heartRate?.let { "$it lpm" } ?: "--",
                         if (uiState.heartRate != null) "Normal" else "Sin datos",
                         if (uiState.heartRate != null) ColorSuccessGreen else ColorVtRingWarning
                     )
                     VitalSignRow(
-                        "Saturación O2",
-                        uiState.oxygenSaturation?.let { "$it%" } ?: "98%",
+                        "Saturaci\u00f3n O2",
+                        uiState.oxygenSaturation?.let { "$it%" } ?: "--",
                         if (uiState.oxygenSaturation != null) "Normal" else "Sin datos",
                         if (uiState.oxygenSaturation != null) ColorSuccessGreen else ColorVtRingWarning
                     )
-                    VitalSignRow("Presión arterial", "120/80", "Normal", ColorSuccessGreen)
-                    VitalSignRow("Temperatura", "36.5°C", "Normal", ColorSuccessGreen)
                 }
             }
 
@@ -189,7 +182,7 @@ fun VitalTrackScreen(
                 )
             } else {
                 Text(
-                    text = "Los datos mostrados son simulados. Conecta tu Dialitech Watch Pro para obtener lecturas reales.",
+                    text = "Todav\u00eda no hay lecturas de este paciente.",
                     fontSize = 12.sp,
                     color = ColorTextMuted,
                     textAlign = TextAlign.Center,

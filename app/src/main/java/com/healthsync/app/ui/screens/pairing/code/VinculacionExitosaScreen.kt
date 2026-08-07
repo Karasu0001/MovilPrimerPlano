@@ -128,7 +128,7 @@ fun VinculacionExitosaScreen(
                             }
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Dialitech Watch Pro",
+                                text = "Dispositivo",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = ColorTextPrimary
@@ -154,7 +154,6 @@ fun VinculacionExitosaScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         MetaBox("Modelo", "DL-V4", Modifier.weight(1f))
-                        MetaBox("Batería", "85%", Modifier.weight(1f))
                         MetaBox("Firmware", "Ahora", Modifier.weight(1f))
                     }
 

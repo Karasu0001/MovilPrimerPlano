@@ -24,9 +24,9 @@ sealed class QrPairingStep {
 
 data class QrPairingUiState(
     val step: QrPairingStep = QrPairingStep.CameraRequest,
-    val qrCodeData: String = "dialitech:pair:9f8e7d6c5b4a3",
-    val deviceName: String = "Dialitech Watch Pro",
-    val deviceModel: String = "DL-W3",
+    val qrCodeData: String = "",
+    val deviceName: String = "Dispositivo",
+    val deviceModel: String = "",
     val deviceSerialNumber: String = "",
     val scannedCode: String? = null,
     val isLoading: Boolean = false,
@@ -47,13 +47,6 @@ class QrPairingViewModel : ViewModel() {
     fun onQrScanned(scannedData: String) {
         uiState = uiState.copy(
             scannedCode = scannedData,
-            step = QrPairingStep.Confirming
-        )
-    }
-
-    fun onSimulateScan() {
-        uiState = uiState.copy(
-            scannedCode = uiState.qrCodeData,
             step = QrPairingStep.Confirming
         )
     }
