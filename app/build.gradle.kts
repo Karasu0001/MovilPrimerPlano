@@ -90,8 +90,8 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     // OkHttp + kotlinx-serialization-json
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:5.4.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.4.0")
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
