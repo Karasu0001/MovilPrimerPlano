@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.healthsync.app.data.AuthSessionStore
+import com.healthsync.app.data.PatientSessionStore
 import com.healthsync.app.ui.screens.activity.ActivityScreen
 import com.healthsync.app.ui.screens.auth.ForgotPasswordScreen
 import com.healthsync.app.ui.screens.auth.LoginScreen
@@ -35,12 +36,19 @@ fun NavGraph(navController: NavHostController) {
             var sessionChecked by remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
                 val token = AuthSessionStore.getToken()
-                if (!token.isNullOrEmpty()) {
-                    navController.navigate(Routes.Dashboard.route) {
-                        popUpTo(Routes.Welcome.route) { inclusive = true }
+                val pairingCode = PatientSessionStore.getPairingCode()
+                when {
+                    !token.isNullOrEmpty() -> {
+                        navController.navigate(Routes.Dashboard.route) {
+                            popUpTo(Routes.Welcome.route) { inclusive = true }
+                        }
                     }
-                } else {
-                    sessionChecked = true
+                    !pairingCode.isNullOrEmpty() -> {
+                        navController.navigate(Routes.VitalTrackFlow.route) {
+                            popUpTo(Routes.Welcome.route) { inclusive = true }
+                        }
+                    }
+                    else -> sessionChecked = true
                 }
             }
             if (sessionChecked) {

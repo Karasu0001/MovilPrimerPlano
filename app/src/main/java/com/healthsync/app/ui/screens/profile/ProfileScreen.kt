@@ -103,24 +103,31 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             AppCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Paciente Vinculado",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorTextPrimary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    if (uiState.hasPatientLinked) {
-                        ProfileRow("Nombre", uiState.patientName ?: "Sin nombre")
-                        ProfileRow("Dispositivo", uiState.deviceSerialNumber ?: "Sin datos")
-                        ProfileRow("Código de vinculación", uiState.pairingCode ?: "Sin datos")
-                    } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "No hay un paciente vinculado. Vincula un dispositivo desde la pantalla de emparejamiento.",
-                            fontSize = 13.sp,
+                            text = "Mis pacientes",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorTextPrimary
+                        )
+                        Text(
+                            text = "Ver la lista completa y vincular dispositivos",
+                            fontSize = 12.sp,
                             color = ColorTextMuted
                         )
+                    }
+                    Button(
+                        onClick = onNavigateToDashboard,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
+                    ) {
+                        Text("Ver", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
