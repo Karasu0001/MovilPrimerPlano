@@ -10,8 +10,8 @@ data class PatientDetailResponse(
     val gender: String = "",
     val notes: String = "",
     val hasDevice: Boolean = false,
-    val lastHeartRate: Int? = null,
-    val lastOxygen: Int? = null,
-    val lastActivity: Int? = null,
+    val lastHeartRate: Double? = null,
+    val lastOxygen: Double? = null,
+    val lastActivity: Double? = null,
     val lastReadingAt: String? = null
 )

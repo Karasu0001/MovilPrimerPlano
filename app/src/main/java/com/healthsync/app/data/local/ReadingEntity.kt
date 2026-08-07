@@ -12,8 +12,8 @@ data class ReadingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val patientId: String,
     val timestamp: String,
-    val heartRate: Int?,
-    val oxygen: Int?,
-    val activity: Int?,
+    val heartRate: Double?,
+    val oxygen: Double?,
+    val activity: Double?,
     val recordedAt: Long
 )

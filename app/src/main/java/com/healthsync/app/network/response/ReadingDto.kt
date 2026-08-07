@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ReadingDto(
     val timestamp: String? = null,
-    val heartRate: Int? = null,
-    val oxygen: Int? = null,
-    val activity: Int? = null
+    val heartRate: Double? = null,
+    val oxygen: Double? = null,
+    val activity: Double? = null
 )

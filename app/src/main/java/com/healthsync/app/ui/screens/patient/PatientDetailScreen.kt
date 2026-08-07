@@ -42,6 +42,7 @@ import com.healthsync.app.ui.theme.ColorPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
 import com.healthsync.app.ui.theme.ColorTextMuted
 import com.healthsync.app.viewmodel.PatientDetailViewModel
+import com.healthsync.app.util.formatVital
 
 @Composable
 fun PatientDetailScreen(
@@ -191,9 +192,9 @@ fun PatientDetailScreen(
                                         color = ColorTextMuted
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    ReadingRow("Frecuencia card\u00edaca", "${reading.heartRate} lpm")
-                                    ReadingRow("Saturaci\u00f3n O2", "${reading.oxygen}%")
-                                    ReadingRow("Actividad", reading.activity.toString())
+                                    ReadingRow("Frecuencia card\u00edaca", "${reading.heartRate.formatVital()} lpm")
+                                    ReadingRow("Saturaci\u00f3n O2", "${reading.oxygen.formatVital()}%")
+                                    ReadingRow("Actividad", reading.activity.formatVital())
                                 }
                             }
                         }

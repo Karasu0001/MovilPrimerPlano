@@ -7,6 +7,7 @@ import com.healthsync.app.data.local.HealthSyncDb
 import com.healthsync.app.data.local.PatientEntity
 import com.healthsync.app.data.local.ReadingEntity
 import com.healthsync.app.data.local.AlertEntity
+import com.healthsync.app.network.extractErrorMessage
 import com.healthsync.app.network.response.AlertDto
 import com.healthsync.app.network.response.CreatePatientRequest
 import com.healthsync.app.network.response.DashboardSummaryResponse
@@ -14,8 +15,6 @@ import com.healthsync.app.network.response.GenerateWearableCodeResponse
 import com.healthsync.app.network.response.PatientDetailResponse
 import com.healthsync.app.network.response.ReadingsResponse
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
 
 class DashboardRepository {
@@ -286,22 +285,4 @@ class DashboardRepository {
         }
     }
 
-    private fun extractErrorMessage(rawBody: String): String? {
-        return try {
-            val jsonElement = ApiClient.json.parseToJsonElement(rawBody)
-            when (jsonElement) {
-                is JsonObject -> {
-                    val error = jsonElement["error"] ?: return null
-                    when (error) {
-                        is JsonObject -> error["message"]?.jsonPrimitive?.content
-                        is kotlinx.serialization.json.JsonPrimitive -> error.content
-                        else -> null
-                    }
-                }
-                else -> null
-            }
-        } catch (_: Exception) {
-            null
-        }
-    }
 }

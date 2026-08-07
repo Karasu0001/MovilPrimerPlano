@@ -3,12 +3,10 @@ package com.healthsync.app.network.repository
 import com.healthsync.app.network.ApiException
 import com.healthsync.app.network.ApiClient
 import com.healthsync.app.network.NetworkResult
+import com.healthsync.app.network.extractErrorMessage
 import com.healthsync.app.network.request.LoginRequest
 import com.healthsync.app.network.request.RegisterRequest
 import com.healthsync.app.network.response.AuthResponse
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
 import kotlinx.coroutines.delay
 
@@ -90,27 +88,4 @@ class AuthRepository {
         }
     }
 
-    private fun extractErrorMessage(rawBody: String): String? {
-        return try {
-            val trimmed = rawBody.trim()
-            if (trimmed.startsWith("{")) {
-                val jsonElement = ApiClient.json.parseToJsonElement(trimmed)
-                when (jsonElement) {
-                    is kotlinx.serialization.json.JsonObject -> {
-                        val error = jsonElement["error"] ?: return null
-                        when (error) {
-                            is kotlinx.serialization.json.JsonObject -> error["message"]?.jsonPrimitive?.content
-                            is kotlinx.serialization.json.JsonPrimitive -> error.content
-                            else -> null
-                        }
-                    }
-                    else -> null
-                }
-            } else {
-                trimmed
-            }
-        } catch (_: Exception) {
-            null
-        }
-    }
 }

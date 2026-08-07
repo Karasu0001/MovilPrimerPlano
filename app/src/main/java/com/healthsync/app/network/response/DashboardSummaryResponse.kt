@@ -14,9 +14,9 @@ data class DashboardSummaryResponse(
 data class PatientSummaryDto(
     val patientId: String = "",
     val name: String = "",
-    val lastHeartRate: Int? = null,
-    val lastOxygen: Int? = null,
-    val lastActivity: Int? = null,
+    val lastHeartRate: Double? = null,
+    val lastOxygen: Double? = null,
+    val lastActivity: Double? = null,
     val lastReadingAt: String? = null,
     val hasDevice: Boolean = false,
     val activeAlerts: Int = 0

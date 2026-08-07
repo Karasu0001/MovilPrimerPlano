@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.healthsync.app.data.PatientSessionStore
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.repository.HealthDataRepository
+import com.healthsync.app.util.formatVital
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,8 @@ import kotlinx.coroutines.launch
 data class VitalTrackUiState(
     val heartRate: String? = null,
     val oxygenSaturation: String? = null,
+    val heartRateRaw: Double? = null,
+    val oxygenSaturationRaw: Double? = null,
     val hasRealData: Boolean = false,
     val isLoading: Boolean = false,
     val networkError: String? = null
@@ -48,8 +51,10 @@ class VitalTrackViewModel : ViewModel() {
                 is NetworkResult.Success -> {
                     val data = result.data
                     _uiState.value = VitalTrackUiState(
-                        heartRate = data.lastHeartRate?.toString(),
-                        oxygenSaturation = data.lastOxygen?.toString(),
+                        heartRate = data.lastHeartRate?.formatVital(),
+                        oxygenSaturation = data.lastOxygen?.formatVital(),
+                        heartRateRaw = data.lastHeartRate,
+                        oxygenSaturationRaw = data.lastOxygen,
                         hasRealData = true,
                         isLoading = false
                     )

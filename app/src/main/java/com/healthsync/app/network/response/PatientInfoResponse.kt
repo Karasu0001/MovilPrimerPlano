@@ -7,8 +7,8 @@ data class PatientInfoResponse(
     val patientCode: String? = null,
     val name: String? = null,
     val deviceSerialNumber: String? = null,
-    val lastHeartRate: Int? = null,
-    val lastOxygen: Int? = null,
-    val lastActivity: Int? = null,
+    val lastHeartRate: Double? = null,
+    val lastOxygen: Double? = null,
+    val lastActivity: Double? = null,
     val lastReadingAt: String? = null
 )

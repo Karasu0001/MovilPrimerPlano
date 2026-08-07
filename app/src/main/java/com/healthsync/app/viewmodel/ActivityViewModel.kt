@@ -20,9 +20,9 @@ data class ActivityUiState(
 
 data class ReadingDisplay(
     val timestamp: String,
-    val heartRate: Int,
-    val oxygen: Int,
-    val activity: Int
+    val heartRate: Double,
+    val oxygen: Double,
+    val activity: Double
 )
 
 class ActivityViewModel : ViewModel() {
@@ -52,9 +52,9 @@ class ActivityViewModel : ViewModel() {
                         .map {
                             ReadingDisplay(
                                 timestamp = it.timestamp ?: "",
-                                heartRate = it.heartRate ?: 0,
-                                oxygen = it.oxygen ?: 0,
-                                activity = it.activity ?: 0
+                                heartRate = it.heartRate ?: 0.0,
+                                oxygen = it.oxygen ?: 0.0,
+                                activity = it.activity ?: 0.0
                             )
                         }
                         .sortedByDescending { it.timestamp }

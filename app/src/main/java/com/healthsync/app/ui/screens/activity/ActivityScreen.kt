@@ -42,6 +42,7 @@ import com.healthsync.app.ui.theme.ColorTextMuted
 import com.healthsync.app.ui.theme.ColorTextPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
 import com.healthsync.app.viewmodel.ActivityViewModel
+import com.healthsync.app.util.formatVital
 
 @Composable
 fun ActivityScreen(
@@ -122,9 +123,9 @@ fun ActivityScreen(
                                 color = ColorTextMuted
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            ReadingRow("Frecuencia cardíaca", "${reading.heartRate} lpm")
-                            ReadingRow("Saturación O2", "${reading.oxygen}%")
-                            ReadingRow("Actividad", reading.activity.toString())
+                            ReadingRow("Frecuencia cardíaca", "${reading.heartRate.formatVital()} lpm")
+                            ReadingRow("Saturación O2", "${reading.oxygen.formatVital()}%")
+                            ReadingRow("Actividad", reading.activity.formatVital())
                         }
                     }
                 }

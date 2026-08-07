@@ -17,9 +17,9 @@ data class PatientDetailUiState(
     val gender: String? = null,
     val notes: String? = null,
     val hasDevice: Boolean = false,
-    val lastHeartRate: Int? = null,
-    val lastOxygen: Int? = null,
-    val lastActivity: Int? = null,
+    val lastHeartRate: Double? = null,
+    val lastOxygen: Double? = null,
+    val lastActivity: Double? = null,
     val lastReadingAt: String? = null,
     val generatedCode: String? = null,
     val codeExpiresIn: Int = 0,
@@ -110,9 +110,9 @@ class PatientDetailViewModel : ViewModel() {
                         .map {
                             ReadingDisplay(
                                 timestamp = it.timestamp ?: "",
-                                heartRate = it.heartRate ?: 0,
-                                oxygen = it.oxygen ?: 0,
-                                activity = it.activity ?: 0
+                                heartRate = it.heartRate ?: 0.0,
+                                oxygen = it.oxygen ?: 0.0,
+                                activity = it.activity ?: 0.0
                             )
                         }
                         .sortedByDescending { it.timestamp }

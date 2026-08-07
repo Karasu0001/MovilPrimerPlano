@@ -25,7 +25,7 @@ abstract class HealthSyncDatabase : RoomDatabase() {
                     context.applicationContext,
                     HealthSyncDatabase::class.java,
                     "healthsync.db"
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration().build().also { instance = it }
             }
         }
     }

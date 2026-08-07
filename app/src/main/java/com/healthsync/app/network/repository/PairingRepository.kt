@@ -3,13 +3,11 @@ package com.healthsync.app.network.repository
 import com.healthsync.app.network.ApiException
 import com.healthsync.app.network.ApiClient
 import com.healthsync.app.network.NetworkResult
+import com.healthsync.app.network.extractErrorMessage
 import com.healthsync.app.network.request.LinkDeviceRequest
 import com.healthsync.app.network.request.ValidateCodeRequest
 import com.healthsync.app.network.response.LinkDeviceResponse
 import com.healthsync.app.network.response.ValidateCodeResponse
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.coroutines.delay
 
 class PairingRepository {
@@ -60,10 +58,16 @@ class PairingRepository {
             when (e.httpCode) {
                 400 -> {
                     val msg = extractErrorMessage(e.rawBody)
-                    NetworkResult.Error(
-                        if (msg == "Invalid code.") "El código ya no es válido, generá uno nuevo"
-                        else msg ?: "El código ya no es válido, generá uno nuevo"
-                    )
+                    val friendly = when {
+                        msg?.contains("expired", ignoreCase = true) == true ->
+                            "El código expiró, generá uno nuevo"
+                        msg?.contains("already registered", ignoreCase = true) == true ->
+                            "Ese dispositivo ya está vinculado a otro paciente"
+                        msg?.contains("Invalid code", ignoreCase = true) == true ->
+                            "El código no existe o es incorrecto"
+                        else -> msg ?: "No se pudo vincular el dispositivo"
+                    }
+                    NetworkResult.Error(friendly)
                 }
                 else -> NetworkResult.Error(extractErrorMessage(e.rawBody) ?: "Error del servidor")
             }
@@ -78,22 +82,4 @@ class PairingRepository {
         }
     }
 
-    private fun extractErrorMessage(rawBody: String): String? {
-        return try {
-            val jsonElement = ApiClient.json.parseToJsonElement(rawBody)
-            when (jsonElement) {
-                is JsonObject -> {
-                    val error = jsonElement["error"] ?: return null
-                    when (error) {
-                        is JsonObject -> error["message"]?.jsonPrimitive?.content
-                        is kotlinx.serialization.json.JsonPrimitive -> error.content
-                        else -> null
-                    }
-                }
-                else -> null
-            }
-        } catch (_: Exception) {
-            null
-        }
-    }
 }

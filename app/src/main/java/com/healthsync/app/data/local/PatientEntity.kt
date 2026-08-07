@@ -12,9 +12,9 @@ data class PatientEntity(
     val notes: String?,
     val hasDevice: Boolean,
     val deviceSerialNumber: String?,
-    val lastHeartRate: Int?,
-    val lastOxygen: Int?,
-    val lastActivity: Int?,
+    val lastHeartRate: Double?,
+    val lastOxygen: Double?,
+    val lastActivity: Double?,
     val lastReadingAt: String?,
     val updatedAt: Long
 )

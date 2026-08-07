@@ -10,9 +10,8 @@ import com.healthsync.app.data.local.ReadingEntity
 import com.healthsync.app.network.request.BatchHealthDataRequest
 import com.healthsync.app.network.request.BatchDataPoint
 import com.healthsync.app.network.response.BatchHealthDataResponse
+import com.healthsync.app.network.extractErrorMessage
 import com.healthsync.app.network.response.PatientInfoResponse
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
 import kotlinx.coroutines.delay
 
@@ -38,9 +37,9 @@ class HealthDataRepository {
                 ReadingEntity(
                     patientId = patientCode,
                     timestamp = dp.timestamp,
-                    heartRate = dp.heartRate.toInt(),
-                    oxygen = dp.oxygen.toInt(),
-                    activity = dp.activity.toInt(),
+                    heartRate = dp.heartRate,
+                    oxygen = dp.oxygen,
+                    activity = dp.activity,
                     recordedAt = now
                 )
             })
@@ -113,22 +112,4 @@ class HealthDataRepository {
         }
     }
 
-    private fun extractErrorMessage(rawBody: String): String? {
-        return try {
-            val jsonElement = ApiClient.json.parseToJsonElement(rawBody)
-            when (jsonElement) {
-                is JsonObject -> {
-                    val error = jsonElement["error"] ?: return null
-                    when (error) {
-                        is JsonObject -> error["message"]?.jsonPrimitive?.content
-                        is kotlinx.serialization.json.JsonPrimitive -> error.content
-                        else -> null
-                    }
-                }
-                else -> null
-            }
-        } catch (_: Exception) {
-            null
-        }
-    }
 }
