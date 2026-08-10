@@ -25,7 +25,6 @@ import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
 import com.healthsync.app.ui.screens.pairing.qr.QrPairingFlowScreen
 import com.healthsync.app.ui.screens.profile.ProfileScreen
 import com.healthsync.app.ui.screens.wearable.vitaltrack.VitalTrackScreen
-import kotlinx.coroutines.launch
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -145,19 +144,15 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(Routes.VitalTrackFlow.route) {
-            val scope = androidx.compose.runtime.rememberCoroutineScope()
+            val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
             VitalTrackScreen(
                 onBack = {
                     if (navController.previousBackStackEntry == null) {
                         // Se llegó acá sin nada atrás (flujo de paciente sin cuenta):
-                        // salir de verdad significa terminar la sesión local, si no
-                        // Welcome te va a rebotar de nuevo hacia acá.
-                        scope.launch {
-                            PatientSessionStore.clearPatientSession()
-                            navController.navigate(Routes.Welcome.route) {
-                                popUpTo(0)
-                            }
-                        }
+                        // no hay que borrar la sesión, solo salir como haría el back
+                        // del sistema. La próxima vez que se abra la app, Welcome ve
+                        // el código guardado y vuelve a traer acá con datos en vivo.
+                        activity?.finish()
                     } else {
                         // Se llegó desde el Dashboard del cuidador: volver normal.
                         navController.popBackStack()
