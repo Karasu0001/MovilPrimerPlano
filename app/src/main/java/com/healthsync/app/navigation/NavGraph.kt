@@ -24,6 +24,7 @@ import com.healthsync.app.ui.screens.pairing.PairingMethodScreen
 import com.healthsync.app.ui.screens.pairing.code.CodePairingFlowScreen
 import com.healthsync.app.ui.screens.pairing.qr.QrPairingFlowScreen
 import com.healthsync.app.ui.screens.profile.ProfileScreen
+import com.healthsync.app.ui.screens.wearable.vitaltrack.PatientHistoryScreen
 import com.healthsync.app.ui.screens.wearable.vitaltrack.VitalTrackScreen
 
 @Composable
@@ -155,7 +156,14 @@ fun NavGraph(navController: NavHostController) {
                         // Se llegó desde el Dashboard del cuidador: volver normal.
                         navController.popBackStack()
                     }
-                }
+                },
+                onViewHistory = { navController.navigate(Routes.VitalHistory.route) }
+            )
+        }
+
+        composable(Routes.VitalHistory.route) {
+            PatientHistoryScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

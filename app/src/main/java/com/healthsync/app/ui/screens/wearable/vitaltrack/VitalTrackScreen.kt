@@ -47,7 +47,8 @@ import java.util.Locale
 
 @Composable
 fun VitalTrackScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onViewHistory: () -> Unit = {}
 ) {
     val vitalTrackViewModel: VitalTrackViewModel = viewModel()
     val uiState by vitalTrackViewModel.uiState.collectAsState()
@@ -179,6 +180,16 @@ fun VitalTrackScreen(
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Ver historial de lecturas →",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorPrimary,
+                    modifier = Modifier.clickable { onViewHistory() }
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
