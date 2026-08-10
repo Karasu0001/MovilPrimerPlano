@@ -84,10 +84,8 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.Dashboard.route) {
             DashboardScreen(
-                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToActivity = { navController.navigate(Routes.Activity.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) },
-                onNavigateToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) },
                 onNavigateToPatientDetail = { patientId ->
                     navController.navigate("detail/$patientId")
                 },
@@ -127,7 +125,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.CodePairingFlow.route) {
             CodePairingFlowScreen(
-                onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
+                onGoToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) {
                     popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
@@ -136,7 +134,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.QrPairingFlow.route) {
             QrPairingFlowScreen(
-                onGoToDashboard = { navController.navigate(Routes.VitalTrackFlow.route) {
+                onGoToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) {
                     popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
@@ -165,7 +163,6 @@ fun NavGraph(navController: NavHostController) {
             ActivityScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToDashboard = { navController.navigate(Routes.Dashboard.route) },
-                onNavigateToPairing = { navController.navigate(Routes.PairingMethod.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) }
             )
         }

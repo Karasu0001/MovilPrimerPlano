@@ -52,10 +52,8 @@ import com.healthsync.app.viewmodel.CaregiverDashboardViewModel
 
 @Composable
 fun DashboardScreen(
-    onNavigateToPairing: () -> Unit = {},
     onNavigateToActivity: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToVitalTrack: () -> Unit = {},
     onNavigateToPatientDetail: (String) -> Unit = {},
     onNavigateToCreatePatient: () -> Unit = {},
     onNavigateToAlerts: () -> Unit = {},

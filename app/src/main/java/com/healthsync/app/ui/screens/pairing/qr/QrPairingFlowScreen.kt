@@ -23,7 +23,7 @@ import com.healthsync.app.viewmodel.QrPairingViewModel
 
 @Composable
 fun QrPairingFlowScreen(
-    onGoToDashboard: () -> Unit,
+    onGoToVitalTrack: () -> Unit,
     onBack: () -> Unit = {},
     viewModel: QrPairingViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -88,7 +88,7 @@ fun QrPairingFlowScreen(
                 }
                 is QrPairingStep.Success -> {
                     QrSuccessScreen(
-                        onGoToDashboard = onGoToDashboard,
+                        onGoToVitalTrack = onGoToVitalTrack,
                         onConfigureDevice = { }
                     )
                 }

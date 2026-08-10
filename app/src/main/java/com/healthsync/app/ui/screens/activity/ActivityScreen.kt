@@ -48,7 +48,6 @@ import com.healthsync.app.util.formatVital
 fun ActivityScreen(
     onBack: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
-    onNavigateToPairing: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
     val activityViewModel: ActivityViewModel = viewModel()
@@ -137,7 +136,6 @@ fun ActivityScreen(
             onItemClick = { route ->
                 when (route) {
                     Routes.Dashboard.route -> onNavigateToDashboard()
-                    Routes.PairingMethod.route -> onNavigateToPairing()
                     Routes.Activity.route -> Unit
                     Routes.Profile.route -> onNavigateToProfile()
                     else -> Unit

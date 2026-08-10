@@ -41,7 +41,7 @@ import com.healthsync.app.ui.theme.ColorTextSecondary
 
 @Composable
 fun VinculacionExitosaScreen(
-    onGoToDashboard: () -> Unit,
+    onGoToVitalTrack: () -> Unit,
     onConfigureDevice: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -176,7 +176,7 @@ fun VinculacionExitosaScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onGoToDashboard,
+                onClick = onGoToVitalTrack,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -184,7 +184,7 @@ fun VinculacionExitosaScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
             ) {
                 Text(
-                    text = "Ir al Dashboard →",
+                    text = "Ver mis datos →",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
