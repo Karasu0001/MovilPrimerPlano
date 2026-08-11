@@ -40,7 +40,7 @@ import com.healthsync.app.ui.theme.ColorTextSecondary
 
 @Composable
 fun QrSuccessScreen(
-    onGoToVitalTrack: () -> Unit,
+    onGoToPatientHome: () -> Unit,
     onConfigureDevice: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -171,7 +171,7 @@ fun QrSuccessScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onGoToVitalTrack,
+                onClick = onGoToPatientHome,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -179,7 +179,7 @@ fun QrSuccessScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
             ) {
                 Text(
-                    text = "Ver mis datos \u2192",
+                    text = "Ir a mi panel \u2192",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

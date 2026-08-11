@@ -23,7 +23,7 @@ import com.healthsync.app.viewmodel.PairingStep
 
 @Composable
 fun CodePairingFlowScreen(
-    onGoToVitalTrack: () -> Unit,
+    onGoToPatientHome: () -> Unit,
     onBack: () -> Unit = {},
     viewModel: CodePairingViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -83,7 +83,7 @@ fun CodePairingFlowScreen(
                 }
                 is PairingStep.Success -> {
                     VinculacionExitosaScreen(
-                        onGoToVitalTrack = onGoToVitalTrack,
+                        onGoToPatientHome = onGoToPatientHome,
                         onConfigureDevice = { /* TODO */ }
                     )
                 }

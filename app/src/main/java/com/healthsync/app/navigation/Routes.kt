@@ -18,6 +18,8 @@ sealed class Routes(val route: String) {
     object Alerts : Routes("alerts")
     object VitalTrackFlow : Routes("vitaltrack/flow")
     object VitalHistory : Routes("vitaltrack/history")
+    object PatientHome : Routes("patient/home")
+    object PatientProfile : Routes("patient/profile")
     object Activity : Routes("activity")
     object Profile : Routes("profile")
 }

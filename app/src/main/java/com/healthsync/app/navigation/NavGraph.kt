@@ -18,6 +18,8 @@ import com.healthsync.app.ui.screens.auth.RegisterScreen
 import com.healthsync.app.ui.screens.dashboard.DashboardScreen
 import com.healthsync.app.ui.screens.patient.PatientDetailScreen
 import com.healthsync.app.ui.screens.patient.CreatePatientScreen
+import com.healthsync.app.ui.screens.patient.PatientHomeScreen
+import com.healthsync.app.ui.screens.patient.PatientProfileScreen
 import com.healthsync.app.ui.screens.alerts.AlertsScreen
 import com.healthsync.app.ui.screens.onboarding.WelcomeScreen
 import com.healthsync.app.ui.screens.pairing.PairingMethodScreen
@@ -45,7 +47,7 @@ fun NavGraph(navController: NavHostController) {
                         }
                     }
                     !pairingCode.isNullOrEmpty() -> {
-                        navController.navigate(Routes.VitalTrackFlow.route) {
+                        navController.navigate(Routes.PatientHome.route) {
                             popUpTo(Routes.Welcome.route) { inclusive = true }
                         }
                     }
@@ -126,7 +128,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.CodePairingFlow.route) {
             CodePairingFlowScreen(
-                onGoToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) {
+                onGoToPatientHome = { navController.navigate(Routes.PatientHome.route) {
                     popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
@@ -135,28 +137,51 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.QrPairingFlow.route) {
             QrPairingFlowScreen(
-                onGoToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) {
+                onGoToPatientHome = { navController.navigate(Routes.PatientHome.route) {
                     popUpTo(Routes.Welcome.route) { inclusive = true }
                 }},
                 onBack = { navController.popBackStack() }
             )
         }
 
-        composable(Routes.VitalTrackFlow.route) {
+        composable(Routes.PatientHome.route) {
             val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
-            VitalTrackScreen(
-                onBack = {
-                    if (navController.previousBackStackEntry == null) {
-                        // Se llegó acá sin nada atrás (flujo de paciente sin cuenta):
-                        // no hay que borrar la sesión, solo salir como haría el back
-                        // del sistema. La próxima vez que se abra la app, Welcome ve
-                        // el código guardado y vuelve a traer acá con datos en vivo.
-                        activity?.finish()
-                    } else {
-                        // Se llegó desde el Dashboard del cuidador: volver normal.
-                        navController.popBackStack()
+            PatientHomeScreen(
+                onGoToVitalTrack = { navController.navigate(Routes.VitalTrackFlow.route) },
+                onGoToHistory = { navController.navigate(Routes.VitalHistory.route) },
+                onGoToProfile = { navController.navigate(Routes.PatientProfile.route) },
+                onLoggedOut = {
+                    navController.navigate(Routes.Welcome.route) {
+                        popUpTo(0) { inclusive = true }
                     }
                 },
+                onBack = {
+                    if (navController.previousBackStackEntry == null) {
+                        // PatientHome es la raíz del flujo de paciente (se llega acá recién
+                        // vinculado o por auto-resume de Welcome): no hay nada atrás, así
+                        // que "volver" es salir de la app, no un no-op silencioso.
+                        activity?.finish()
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+
+        composable(Routes.PatientProfile.route) {
+            PatientProfileScreen(
+                onBack = { navController.popBackStack() },
+                onLoggedOut = {
+                    navController.navigate(Routes.Welcome.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Routes.VitalTrackFlow.route) {
+            VitalTrackScreen(
+                onBack = { navController.popBackStack() },
                 onViewHistory = { navController.navigate(Routes.VitalHistory.route) }
             )
         }
