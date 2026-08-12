@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    private const val BASE_URL = "https://api-dialitech-core-v2.onrender.com/"
+    private val BASE_URL = BuildConfig.API_BASE_URL
     private const val CONNECT_TIMEOUT_SECONDS = 60L
     private const val READ_TIMEOUT_SECONDS = 60L
     private const val WRITE_TIMEOUT_SECONDS = 60L
