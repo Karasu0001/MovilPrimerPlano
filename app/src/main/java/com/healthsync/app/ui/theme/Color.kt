@@ -48,3 +48,8 @@ val ColorWearableSuccessBg = Color(0xFFE7F3F8)
 val ColorVtBg = Color(0xFF05070C)
 val ColorVtRingWarning = Color(0xFFF59E0B)
 val ColorVtRingSuccess = Color(0xFF22C55E)
+
+// Auth wave
+val ColorAuthGradientStart = Color(0xFF1E3A8A)
+val ColorAuthGradientEnd = Color(0xFF1D4ED8)
+val ColorAuthWave = Color(0xFF2563EB)
