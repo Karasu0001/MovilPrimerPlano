@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.healthsync.app.ui.theme.ColorErrorRed
 import com.healthsync.app.ui.theme.ColorPrimary
 import com.healthsync.app.ui.theme.ColorTextSecondary
+import com.healthsync.app.ui.components.AuthWaveBackground
 import com.healthsync.app.viewmodel.AlertsViewModel
 
 @Composable
@@ -52,62 +54,92 @@ fun AlertsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Row(
+    LaunchedEffect(Unit) {
+        viewModel.loadAlerts()
+    }
+
+    AuthWaveBackground {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Atras")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Atras", tint = Color.White)
             }
             Text(
                 text = "Alertas",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = ColorPrimary,
+                color = Color.White,
                 modifier = Modifier.weight(1f)
             )
         }
 
         if (uiState.isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Cargando alertas...",
-                    fontSize = 14.sp,
-                    color = ColorTextSecondary
-                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Cargando alertas...",
+                        fontSize = 14.sp,
+                        color = ColorTextSecondary
+                    )
+                }
             }
         } else {
             val networkError = uiState.networkError
             if (networkError != null) {
-                Text(
-                    text = networkError,
-                    fontSize = 14.sp,
-                    color = ColorErrorRed,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { viewModel.loadAlerts() },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(12.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .padding(16.dp)
                 ) {
-                    Text("Reintentar", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(
+                        text = networkError,
+                        fontSize = 14.sp,
+                        color = ColorErrorRed,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { viewModel.loadAlerts() },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Reintentar", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             } else if (uiState.alerts.isEmpty()) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Warning,
                             contentDescription = null,
@@ -136,6 +168,7 @@ fun AlertsScreen(
                 }
             }
         }
+    }
     }
 }
 
