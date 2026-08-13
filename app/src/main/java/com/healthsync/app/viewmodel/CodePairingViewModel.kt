@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.healthsync.app.data.DeviceIdentifier
 import com.healthsync.app.data.PatientSessionStore
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.repository.PairingRepository
@@ -26,8 +27,6 @@ data class CodePairingUiState(
     val step: PairingStep = PairingStep.Searching,
     val pairingCode: String = "",
     val deviceName: String = "Dispositivo",
-    val deviceModel: String = "",
-    val deviceSerialNumber: String = "",
     val isLoading: Boolean = false,
     val networkError: String? = null,
     val patientCode: String? = null
@@ -71,8 +70,7 @@ class CodePairingViewModel : ViewModel() {
         when (validateResult) {
             is NetworkResult.Success -> {
                 val patientId = validateResult.data.patientId ?: ""
-                val serialNumber = uiState.deviceSerialNumber.takeIf { it.isNotEmpty() }
-                    ?: uiState.deviceModel
+                val serialNumber = DeviceIdentifier.getId()
                 val linkResult = pairingRepository.linkDevice(
                     uiState.pairingCode.replace(" ", ""),
                     serialNumber

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.healthsync.app.data.DeviceIdentifier
 import com.healthsync.app.data.PatientSessionStore
 import com.healthsync.app.network.NetworkResult
 import com.healthsync.app.network.repository.PairingRepository
@@ -26,8 +27,6 @@ data class QrPairingUiState(
     val step: QrPairingStep = QrPairingStep.CameraRequest,
     val qrCodeData: String = "",
     val deviceName: String = "Dispositivo",
-    val deviceModel: String = "",
-    val deviceSerialNumber: String = "",
     val scannedCode: String? = null,
     val isLoading: Boolean = false,
     val networkError: String? = null
@@ -55,8 +54,7 @@ class QrPairingViewModel : ViewModel() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, networkError = null)
             val code = extractPairingCode(uiState.scannedCode ?: uiState.qrCodeData)
-            val serialNumber = uiState.deviceSerialNumber.takeIf { it.isNotEmpty() }
-                ?: uiState.deviceModel
+            val serialNumber = DeviceIdentifier.getId()
             val validateResult = pairingRepository.validateCode(code)
             handleValidateResult(validateResult, code, serialNumber)
         }
