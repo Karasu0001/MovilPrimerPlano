@@ -119,8 +119,13 @@ class CodePairingViewModel : ViewModel() {
     }
 
     fun onRetry() {
+        // Vuelve a la pantalla de ingresar código (no reenvía el mismo código
+        // que acaba de fallar): si el motivo del rechazo fue que ese código ya
+        // se usó, reintentar con el mismo código solo iba a fallar de nuevo en
+        // loop, sin darle al usuario forma de escribir uno distinto.
         uiState = uiState.copy(
-            step = PairingStep.Confirming,
+            step = PairingStep.Searching,
+            pairingCode = "",
             networkError = null
         )
     }
@@ -132,6 +137,7 @@ class CodePairingViewModel : ViewModel() {
     fun onGoHome() {
         uiState = uiState.copy(
             step = PairingStep.Searching,
+            pairingCode = "",
             networkError = null
         )
     }
